@@ -3,7 +3,16 @@
 import { useState, useEffect } from "react";
 // 1. Added Variants type here
 import { motion, Variants } from "framer-motion";
-import { Mail, Github, Linkedin, Send, Sparkles, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Github,
+  Linkedin,
+  Send,
+  Sparkles,
+  Loader2,
+  Code2,
+} from "lucide-react";
+import { Profile } from "@/types";
 import toast from "react-hot-toast";
 
 // 2. Applied Variants type to fix red squiggles
@@ -32,9 +41,21 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   // Added effect to trigger the reveal animation after a brief loading state
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        const data = await response.json();
+        setProfile(data);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
     const timer = setTimeout(() => setIsInitialLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
@@ -202,22 +223,29 @@ export default function Contact() {
           variants={itemVariants}
           className="mt-20 w-full max-w-lg"
         >
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4 flex-wrap">
             {[
               {
                 icon: Github,
-                href: process.env.NEXT_PUBLIC_PORTFOLIO_GITHUB || "#",
+                href: profile?.github || "#",
                 label: "GitHub",
               },
               {
                 icon: Linkedin,
-                href: process.env.NEXT_PUBLIC_PORTFOLIO_LINKEDIN || "#",
+                href: profile?.linkedin || "#",
                 label: "LinkedIn",
               },
               {
                 icon: Mail,
-                href: `mailto:${process.env.NEXT_PUBLIC_PORTFOLIO_EMAIL}`,
+                href: profile?.email
+                  ? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=${profile.email}`
+                  : "#",
                 label: "Email",
+              },
+              {
+                icon: Code2,
+                href: profile?.leetcode || "#",
+                label: "LeetCode",
               },
             ].map((link, i) => (
               <a

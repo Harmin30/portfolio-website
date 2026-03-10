@@ -10,6 +10,8 @@ import {
   Check,
   Award,
   ExternalLink,
+  Calendar,
+  Building2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Certificate } from "@/types";
@@ -39,13 +41,9 @@ export default function AdminCertificates() {
         .select("*")
         .order("date_obtained", { ascending: false });
 
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
-      }
+      if (error) throw error;
       setCertificates(data || []);
     } catch (error: any) {
-      console.error("Error fetching certificates:", error);
       toast.error(error?.message || "Failed to fetch certificates");
     } finally {
       setIsLoading(false);
@@ -55,19 +53,11 @@ export default function AdminCertificates() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !formData.title.trim() ||
-      !formData.issuer.trim() ||
-      !formData.date_obtained ||
-      !formData.certificate_url.trim()
-    ) {
-      toast.error(
-        "Title, issuer, date obtained, and certificate URL are required",
-      );
+    if (!formData.title.trim() || !formData.issuer.trim() || !formData.date_obtained || !formData.certificate_url.trim()) {
+      toast.error("Required fields are missing");
       return;
     }
 
-    // Validate URL
     try {
       new URL(formData.certificate_url);
     } catch {
@@ -77,18 +67,11 @@ export default function AdminCertificates() {
 
     try {
       if (editingId) {
-        const { error } = await supabase
-          .from("certificates")
-          .update(formData)
-          .eq("id", editingId);
-
+        const { error } = await supabase.from("certificates").update(formData).eq("id", editingId);
         if (error) throw error;
         toast.success("Certificate updated!");
       } else {
-        const { error } = await supabase
-          .from("certificates")
-          .insert([formData]);
-
+        const { error } = await supabase.from("certificates").insert([formData]);
         if (error) throw error;
         toast.success("Certificate added!");
       }
@@ -96,199 +79,105 @@ export default function AdminCertificates() {
       resetForm();
       await fetchCertificates();
     } catch (error: any) {
-      console.error("Error saving certificate:", error);
       toast.error(error?.message || "Failed to save certificate");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this certificate?")) return;
-
+    if (!confirm("Are you sure?")) return;
     try {
-      const { error } = await supabase
-        .from("certificates")
-        .delete()
-        .eq("id", id);
-
+      const { error } = await supabase.from("certificates").delete().eq("id", id);
       if (error) throw error;
       toast.success("Certificate deleted!");
       await fetchCertificates();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to delete certificate");
+      toast.error(error?.message || "Failed to delete");
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      title: "",
-      issuer: "",
-      date_obtained: "",
-      certificate_url: "",
-      description: "",
-    });
+    setFormData({ title: "", issuer: "", date_obtained: "", certificate_url: "", description: "" });
     setEditingId(null);
     setShowForm(false);
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-    });
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
   };
 
+  const inputClass = "w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400";
+  const labelClass = "block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2";
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-8 pb-10">
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Certificates</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {certificates.length} certification
-            {certificates.length !== 1 ? "s" : ""}
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Certificates</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {certificates.length} credentials earned.
           </p>
         </div>
         <button
-          onClick={() => {
-            if (showForm && !editingId) {
-              resetForm();
-            } else {
-              resetForm();
-              setShowForm(true);
-            }
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
         >
-          <Plus size={16} />
-          Add Certificate
+          <Plus size={18} />
+          <span>Add Certificate</span>
         </button>
       </div>
 
-      {/* Form */}
+      {/* Form Card */}
       <AnimatePresence>
         {showForm && (
           <motion.div
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm"
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white dark:bg-[#16191f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-base">
-                {editingId ? "Edit Certificate" : "New Certificate"}
-              </h2>
-              <button
-                onClick={resetForm}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={16} />
-              </button>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 dark:text-slate-200">{editingId ? "Modify Credential" : "New Credential"}</h2>
+              <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={20} /></button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Certificate Title *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    autoFocus
-                    required
-                    placeholder="e.g. AWS Solutions Architect"
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>Certificate Title *</label>
+                  <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} autoFocus required placeholder="e.g. AWS Solutions Architect" className={inputClass} />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Issuing Organization *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.issuer}
-                    onChange={(e) =>
-                      setFormData({ ...formData, issuer: e.target.value })
-                    }
-                    required
-                    placeholder="e.g. Amazon Web Services"
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
+                <div className="space-y-1">
+                  <label className={labelClass}>Issuing Organization *</label>
+                  <input type="text" value={formData.issuer} onChange={(e) => setFormData({ ...formData, issuer: e.target.value })} required placeholder="e.g. Amazon Web Services" className={inputClass} />
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Date Obtained *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.date_obtained}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        date_obtained: e.target.value,
-                      })
-                    }
-                    required
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>Date Obtained *</label>
+                  <div className="relative">
+                    <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input type="date" value={formData.date_obtained} onChange={(e) => setFormData({ ...formData, date_obtained: e.target.value })} required className={`${inputClass} pl-10`} />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Certificate URL *
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.certificate_url}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        certificate_url: e.target.value,
-                      })
-                    }
-                    required
-                    placeholder="https://example.com/certificate"
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
+                <div className="space-y-1">
+                  <label className={labelClass}>Certificate URL *</label>
+                  <input type="url" value={formData.certificate_url} onChange={(e) => setFormData({ ...formData, certificate_url: e.target.value })} required placeholder="https://..." className={inputClass} />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Description (optional)
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={2}
-                  placeholder="Additional details about this certification..."
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition resize-none"
-                />
+
+              <div className="space-y-1">
+                <label className={labelClass}>Brief Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} placeholder="Optional details..." className={`${inputClass} resize-none`} />
               </div>
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
-                >
-                  <Check size={14} />
-                  {editingId ? "Update Certificate" : "Add Certificate"}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={resetForm} className="px-6 py-2 text-sm font-bold text-slate-500 transition-colors hover:text-slate-800">Cancel</button>
+                <button type="submit" className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                  <Check size={18} />
+                  <span>{editingId ? "Update Certificate" : "Add Certificate"}</span>
                 </button>
               </div>
             </form>
@@ -298,87 +187,61 @@ export default function AdminCertificates() {
 
       {/* List */}
       {isLoading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-20 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse"
-            />
-          ))}
+        <div className="space-y-4">
+          {[1, 2, 3].map((n) => (<div key={n} className="h-24 rounded-2xl bg-slate-100 dark:bg-white/5 animate-pulse" />))}
         </div>
       ) : certificates.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <Award size={36} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">No certificates yet. Add your first one!</p>
+        <div className="text-center py-20 bg-white dark:bg-[#16191f] rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/5">
+          <Award size={40} className="mx-auto mb-4 text-slate-300 opacity-50" />
+          <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">No certifications found</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-4">
           {certificates.map((cert) => (
             <motion.div
               key={cert.id}
               layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 transition-all hover:border-indigo-500/30 hover:shadow-sm"
             >
-              <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex-shrink-0">
-                <Award
-                  size={16}
-                  className="text-amber-600 dark:text-amber-400"
-                />
+              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex-shrink-0 border border-indigo-100 dark:border-indigo-500/20">
+                <Award size={22} />
               </div>
+
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{cert.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[11px] font-medium text-blue-600 dark:text-blue-400">
-                    {cert.issuer}
-                  </span>
-                  <span className="text-[11px] text-gray-400">·</span>
-                  <span className="text-[11px] text-gray-400">
-                    {formatDate(cert.date_obtained)}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{cert.title}</h3>
+                  <div className="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                    <Building2 size={12} /> {cert.issuer}
                   </span>
                 </div>
-                {cert.description && (
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-1">
-                    {cert.description}
-                  </p>
-                )}
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{formatDate(cert.date_obtained)}</span>
+                  {cert.description && (
+                    <>
+                      <span className="text-slate-300 dark:text-slate-700 font-bold text-xs">·</span>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 italic">{cert.description}</p>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <a
-                  href={cert.certificate_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 text-gray-400 hover:text-blue-500 transition-colors"
-                  title="View certificate"
-                >
-                  <ExternalLink size={13} />
+
+              <div className="flex items-center gap-2">
+                <a href={cert.certificate_url} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10">
+                  <ExternalLink size={16} />
                 </a>
-                <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => {
-                      setFormData({
-                        title: cert.title,
-                        issuer: cert.issuer,
-                        date_obtained: cert.date_obtained,
-                        certificate_url: cert.certificate_url,
-                        description: cert.description || "",
-                      });
-                      setEditingId(cert.id);
-                      setShowForm(true);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <Edit2 size={13} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(cert.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
+                <div className="h-6 w-[1px] bg-slate-100 dark:bg-white/10 mx-1" />
+                <button onClick={() => {
+                  setFormData({ title: cert.title, issuer: cert.issuer, date_obtained: cert.date_obtained, certificate_url: cert.certificate_url, description: cert.description || "" });
+                  setEditingId(cert.id);
+                  setShowForm(true);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }} className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  <Edit2 size={16} />
+                </button>
+                <button onClick={() => handleDelete(cert.id)} className="p-2.5 rounded-xl text-slate-400 hover:text-red-500 transition-colors">
+                  <Trash2 size={16} />
+                </button>
               </div>
             </motion.div>
           ))}

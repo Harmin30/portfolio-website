@@ -12,6 +12,8 @@ import {
   FileText,
   Globe,
   EyeOff,
+  Calendar,
+  Type,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -148,174 +150,104 @@ export default function AdminBlog() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="h-8 w-48 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse" />
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-20 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse"
-          />
-        ))}
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="h-8 w-48 rounded-lg bg-slate-100 dark:bg-slate-800 animate-pulse" />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
+  const inputClass = "w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400";
+  const labelClass = "block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2";
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-8 pb-10">
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Blog Posts</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {posts.filter((p) => p.published).length} published ·{" "}
-            {posts.filter((p) => !p.published).length} drafts
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Blog</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {posts.filter((p) => p.published).length} published · {posts.filter((p) => !p.published).length} drafts
           </p>
         </div>
         <button
-          onClick={() => {
-            if (showForm && !editingId) {
-              resetForm();
-            } else {
-              resetForm();
-              setShowForm(true);
-            }
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
         >
-          <Plus size={16} />
-          New Post
+          <Plus size={18} />
+          <span>New Article</span>
         </button>
       </div>
 
-      {/* Form */}
+      {/* Editor Form */}
       <AnimatePresence>
         {showForm && (
           <motion.div
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm"
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white dark:bg-[#16191f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-base">
-                {editingId ? "Edit Post" : "New Post"}
-              </h2>
-              <button
-                onClick={resetForm}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={16} />
-              </button>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 dark:text-slate-200">{editingId ? "Edit Article" : "Write Article"}</h2>
+              <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={20} /></button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Title *
+            
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>Article Title *</label>
+                  <input type="text" name="title" value={formData.title} onChange={handleChange} autoFocus required placeholder="How to build..." className={inputClass} />
+                </div>
+                <div className="space-y-1">
+                  <label className={labelClass}>Custom Slug (URL Path)</label>
+                  <input type="text" name="slug" value={formData.slug} onChange={handleChange} placeholder="how-to-build" className={inputClass} />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>Featured Image URL</label>
+                  <input type="url" name="image" value={formData.image} onChange={handleChange} placeholder="https://..." className={inputClass} />
+                </div>
+                <div className="flex items-end pb-1">
+                  <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 w-full">
+                    <div
+                      onClick={() => setFormData({ ...formData, published: !formData.published })}
+                      className={`relative w-10 h-5 rounded-full transition-colors ${formData.published ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-700"}`}
+                    >
+                      <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${formData.published ? "translate-x-5" : ""}`} />
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
+                      {formData.published ? "Set as Published" : "Keep as Draft"}
+                    </span>
                   </label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    autoFocus
-                    required
-                    placeholder="Post title"
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                    Slug
-                  </label>
-                  <input
-                    type="text"
-                    name="slug"
-                    value={formData.slug}
-                    onChange={handleChange}
-                    placeholder="auto-generated-from-title"
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                  />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Featured Image URL
-                </label>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                />
+
+              <div className="space-y-1">
+                <label className={labelClass}>Short Summary (Excerpt)</label>
+                <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={2} placeholder="A brief hook for your readers..." className={`${inputClass} resize-none`} />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Excerpt
-                </label>
-                <textarea
-                  name="excerpt"
-                  value={formData.excerpt}
-                  onChange={handleChange}
-                  rows={2}
-                  placeholder="Brief summary of the post..."
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition resize-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Content (Markdown supported)
-                </label>
-                <textarea
-                  name="content"
-                  value={formData.content}
-                  onChange={handleChange}
-                  rows={8}
-                  placeholder="Write your post content..."
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition font-mono resize-none"
-                />
-              </div>
-              <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                <div
-                  onClick={() =>
-                    setFormData({ ...formData, published: !formData.published })
-                  }
-                  className={`relative w-9 h-5 rounded-full transition-colors ${formData.published ? "bg-emerald-500" : "bg-gray-300 dark:bg-gray-600"}`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${formData.published ? "translate-x-4" : ""}`}
-                  />
+
+              <div className="space-y-1">
+                <div className="flex justify-between items-center mb-2">
+                  <label className={labelClass}>Article Content</label>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">Markdown Supported</span>
                 </div>
-                <span className="text-sm font-medium">
-                  {formData.published ? "Published" : "Draft"}
-                </span>
-              </label>
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 disabled:opacity-50 transition-colors"
-                >
-                  <Check size={14} />
-                  {isSaving
-                    ? "Saving…"
-                    : editingId
-                      ? "Update Post"
-                      : "Create Post"}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
+                <textarea name="content" value={formData.content} onChange={handleChange} rows={12} placeholder="Write your thoughts here..." className={`${inputClass} font-mono leading-relaxed resize-none`} />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={resetForm} className="px-6 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">Discard</button>
+                <button type="submit" disabled={isSaving} className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                  <Check size={18} />
+                  <span>{isSaving ? "Saving..." : editingId ? "Update Article" : "Publish Article"}</span>
                 </button>
               </div>
             </form>
@@ -323,65 +255,50 @@ export default function AdminBlog() {
         )}
       </AnimatePresence>
 
-      {/* Posts List */}
+      {/* Articles List */}
       {posts.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <p className="text-sm">
-            No posts yet. Click <strong>New Post</strong> to get started.
-          </p>
+        <div className="text-center py-20 bg-white dark:bg-[#16191f] rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/5">
+          <FileText size={40} className="mx-auto mb-4 text-slate-300 opacity-50" />
+          <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">No articles written yet</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {posts.map((post) => (
             <motion.div
               key={post.id}
               layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm transition-all"
+              className="group flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 transition-all hover:border-indigo-500/30 hover:shadow-sm"
             >
-              <div
-                className={`p-2 rounded-lg flex-shrink-0 ${post.published ? "bg-emerald-50 dark:bg-emerald-950/40" : "bg-gray-100 dark:bg-gray-700"}`}
-              >
-                {post.published ? (
-                  <Globe
-                    size={15}
-                    className="text-emerald-600 dark:text-emerald-400"
-                  />
-                ) : (
-                  <EyeOff size={15} className="text-gray-400" />
-                )}
+              <div className={`w-12 h-12 flex items-center justify-center rounded-xl border flex-shrink-0 ${post.published ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20" : "bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-100 dark:border-white/5"}`}>
+                {post.published ? <Globe size={20} /> : <EyeOff size={20} />}
               </div>
+
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium truncate">{post.title}</p>
-                  <span
-                    className={`hidden sm:block flex-shrink-0 text-[11px] font-medium px-1.5 py-0.5 rounded-md ${post.published ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}
-                  >
-                    {post.published ? "Published" : "Draft"}
+                <div className="flex items-center gap-3">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{post.title}</h3>
+                  <span className={`text-[10px] font-black uppercase tracking-tighter px-2 py-0.5 rounded ${post.published ? "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400" : "bg-slate-100 dark:bg-white/10 text-slate-500"}`}>
+                    {post.published ? "Online" : "Draft"}
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
-                  {post.excerpt
-                    ? post.excerpt.slice(0, 80) +
-                      (post.excerpt.length > 80 ? "…" : "")
-                    : ""}
-                  {post.created_at &&
-                    ` · ${new Date(post.created_at).toLocaleDateString()}`}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Calendar size={12} className="text-slate-400" />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {post.created_at ? new Date(post.created_at).toLocaleDateString() : 'N/A'}
+                  </span>
+                  {post.excerpt && (
+                    <p className="hidden md:block text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-md italic">
+                      · {post.excerpt}
+                    </p>
+                  )}
+                </div>
               </div>
-              <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-shrink-0">
-                <button
-                  onClick={() => handleEdit(post)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                >
-                  <Edit2 size={13} />
+
+              <div className="flex items-center gap-2">
+                <button onClick={() => handleEdit(post)} className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  <Edit2 size={16} />
                 </button>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 size={13} />
+                <button onClick={() => handleDelete(post.id)} className="p-2.5 rounded-xl text-slate-400 hover:text-red-500 transition-colors">
+                  <Trash2 size={16} />
                 </button>
               </div>
             </motion.div>

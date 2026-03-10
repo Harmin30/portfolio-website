@@ -7,8 +7,8 @@ export interface Profile {
   hero_image?: string;
   github?: string;
   linkedin?: string;
-  twitter?: string;
   email?: string;
+  leetcode?: string;
   created_at: string;
   updated_at: string;
 }

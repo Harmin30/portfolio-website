@@ -14,6 +14,7 @@ import {
   Server,
   Database,
   Wrench,
+  BarChart3,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -32,30 +33,30 @@ const CATEGORY_CONFIG: Record<
 > = {
   frontend: {
     label: "Frontend",
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-950/40",
-    border: "border-blue-200 dark:border-blue-800",
+    color: "text-indigo-600 dark:text-indigo-400",
+    bg: "bg-indigo-50/50 dark:bg-indigo-500/10",
+    border: "border-indigo-100 dark:border-indigo-500/20",
     icon: Code2,
   },
   backend: {
     label: "Backend",
-    color: "text-emerald-600 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-950/40",
-    border: "border-emerald-200 dark:border-emerald-800",
+    color: "text-slate-600 dark:text-slate-400",
+    bg: "bg-slate-100/50 dark:bg-white/5",
+    border: "border-slate-200 dark:border-white/10",
     icon: Server,
   },
   database: {
     label: "Database",
-    color: "text-orange-600 dark:text-orange-400",
-    bg: "bg-orange-50 dark:bg-orange-950/40",
-    border: "border-orange-200 dark:border-orange-800",
+    color: "text-indigo-600 dark:text-indigo-400",
+    bg: "bg-indigo-50/50 dark:bg-indigo-500/10",
+    border: "border-indigo-100 dark:border-indigo-500/20",
     icon: Database,
   },
   tools: {
     label: "Tools",
-    color: "text-violet-600 dark:text-violet-400",
-    bg: "bg-violet-50 dark:bg-violet-950/40",
-    border: "border-violet-200 dark:border-violet-800",
+    color: "text-slate-600 dark:text-slate-400",
+    bg: "bg-slate-100/50 dark:bg-white/5",
+    border: "border-slate-200 dark:border-white/10",
     icon: Wrench,
   },
 };
@@ -64,9 +65,9 @@ const LEVEL_CONFIG: Record<
   Level,
   { label: string; dots: number; color: string }
 > = {
-  beginner: { label: "Beginner", dots: 1, color: "bg-yellow-400" },
-  intermediate: { label: "Intermediate", dots: 2, color: "bg-blue-500" },
-  advanced: { label: "Advanced", dots: 3, color: "bg-emerald-500" },
+  beginner: { label: "Beginner", dots: 1, color: "bg-slate-300 dark:bg-slate-600" },
+  intermediate: { label: "Intermediate", dots: 2, color: "bg-indigo-400" },
+  advanced: { label: "Advanced", dots: 3, color: "bg-indigo-600" },
 };
 
 const CATEGORIES = Object.keys(CATEGORY_CONFIG) as Category[];
@@ -79,7 +80,7 @@ function LevelDots({ level }: { level: Level }) {
       {[1, 2, 3].map((n) => (
         <span
           key={n}
-          className={`w-1.5 h-1.5 rounded-full ${n <= cfg.dots ? cfg.color : "bg-gray-200 dark:bg-gray-600"}`}
+          className={`w-1 h-1 rounded-full ${n <= cfg.dots ? cfg.color : "bg-slate-200 dark:bg-white/10"}`}
         />
       ))}
     </span>
@@ -93,18 +94,18 @@ function SkillIcon({ name }: { name: string }) {
     .replace("js", "javascript")
     .replace("ts", "typescript");
   return (
-    <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
+    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-white/5 overflow-hidden flex-shrink-0">
       <img
         src={`https://cdn.simpleicons.org/${slug}/gray`}
         alt={name}
-        width={18}
-        height={18}
-        className="dark:invert"
+        width={20}
+        height={20}
+        className="dark:opacity-70 dark:invert grayscale"
         onError={(e) => {
           const t = e.currentTarget;
           t.style.display = "none";
           if (t.parentElement) {
-            t.parentElement.innerHTML = `<span class="text-xs font-bold text-gray-400">${name.slice(0, 2).toUpperCase()}</span>`;
+            t.parentElement.innerHTML = `<span class="text-[10px] font-black text-slate-400">${name.slice(0, 2).toUpperCase()}</span>`;
           }
         }}
       />
@@ -125,23 +126,15 @@ export default function AdminSkills() {
     level: "intermediate" as Level,
   });
 
-  useEffect(() => {
-    fetchSkills();
-  }, []);
+  useEffect(() => { fetchSkills(); }, []);
 
   const fetchSkills = async () => {
     try {
-      const { data, error } = await supabase
-        .from("skills")
-        .select("*")
-        .order("category")
-        .order("name");
+      const { data, error } = await supabase.from("skills").select("*").order("category").order("name");
       if (error) throw new Error(error.message);
       setSkills(data || []);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to fetch skills";
-      toast.error(message);
+      toast.error(err instanceof Error ? err.message : "Failed to fetch skills");
     } finally {
       setIsLoading(false);
     }
@@ -149,17 +142,11 @@ export default function AdminSkills() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      toast.error("Skill name is required");
-      return;
-    }
+    if (!formData.name.trim()) { toast.error("Skill name is required"); return; }
     setSaving(true);
     try {
       if (editingId) {
-        const { error } = await supabase
-          .from("skills")
-          .update(formData)
-          .eq("id", editingId);
+        const { error } = await supabase.from("skills").update(formData).eq("id", editingId);
         if (error) throw error;
         toast.success("Skill updated!");
       } else {
@@ -170,9 +157,7 @@ export default function AdminSkills() {
       resetForm();
       await fetchSkills();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to save skill";
-      toast.error(message);
+      toast.error(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -186,9 +171,7 @@ export default function AdminSkills() {
       toast.success("Skill deleted!");
       await fetchSkills();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to delete skill";
-      toast.error(message);
+      toast.error("Failed to delete skill");
     }
   };
 
@@ -209,184 +192,81 @@ export default function AdminSkills() {
     setShowForm(false);
   };
 
-  const filteredSkills =
-    activeTab === "all"
-      ? skills
-      : skills.filter((s) => s.category === activeTab);
+  const filteredSkills = activeTab === "all" ? skills : skills.filter((s) => s.category === activeTab);
+
+  const inputClass = "w-full px-4 py-2 rounded-xl text-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all";
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 max-w-6xl mx-auto">
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Skills</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {skills.length} skill{skills.length !== 1 ? "s" : ""} across{" "}
-            {
-              CATEGORIES.filter((c) => skills.some((s) => s.category === c))
-                .length
-            }{" "}
-            categories
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Skills</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage your technical expertise and proficiency levels.</p>
         </div>
         <button
-          onClick={() => {
-            if (showForm && !editingId) {
-              resetForm();
-            } else {
-              setEditingId(null);
-              setFormData({
-                name: "",
-                category: "frontend",
-                level: "intermediate",
-              });
-              setShowForm(true);
-            }
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
         >
-          <Plus size={16} />
-          Add Skill
+          <Plus size={18} />
+          <span>New Skill</span>
         </button>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {CATEGORIES.map((cat) => {
           const cfg = CATEGORY_CONFIG[cat];
-          const Icon = cfg.icon;
           const count = skills.filter((s) => s.category === cat).length;
           return (
-            <button
-              key={cat}
-              onClick={() => setActiveTab(activeTab === cat ? "all" : cat)}
-              className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${activeTab === cat ? `${cfg.bg} ${cfg.border}` : "bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"}`}
-            >
-              <div className={`p-2 rounded-lg ${cfg.bg} ${cfg.border} border`}>
-                <Icon size={16} className={cfg.color} />
+            <div key={cat} className="p-5 rounded-2xl bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 shadow-sm">
+              <div className={`w-10 h-10 rounded-xl ${cfg.bg} ${cfg.color} flex items-center justify-center mb-4 border ${cfg.border}`}>
+                <cfg.icon size={20} />
               </div>
-              <div>
-                <p
-                  className={`text-lg font-bold ${activeTab === cat ? cfg.color : ""}`}
-                >
-                  {count}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {cfg.label}
-                </p>
-              </div>
-            </button>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{count}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{cfg.label}</p>
+            </div>
           );
         })}
       </div>
 
-      {/* Add / Edit Form */}
+      {/* Form */}
       <AnimatePresence>
         {showForm && (
           <motion.div
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm"
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white dark:bg-[#16191f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-base">
-                {editingId ? "Edit Skill" : "New Skill"}
-              </h2>
-              <button
-                onClick={resetForm}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={16} />
-              </button>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 dark:text-slate-200">{editingId ? "Edit Skill" : "Add New Skill"}</h2>
+              <button onClick={resetForm} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
             </div>
-            <form onSubmit={handleSubmit} className="grid sm:grid-cols-3 gap-4">
-              {/* Name */}
-              <div className="sm:col-span-1">
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Skill Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  autoFocus
-                  required
-                  placeholder="e.g. React, Python…"
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                />
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div className="grid sm:grid-cols-3 gap-6">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Skill Name</label>
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} autoFocus required className={inputClass} placeholder="e.g. React" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Category</label>
+                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value as Category })} className={inputClass}>
+                    {CATEGORIES.map((c) => (<option key={c} value={c}>{CATEGORY_CONFIG[c].label}</option>))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Level</label>
+                  <select value={formData.level} onChange={(e) => setFormData({ ...formData, level: e.target.value as Level })} className={inputClass}>
+                    {LEVELS.map((l) => (<option key={l} value={l}>{LEVEL_CONFIG[l].label}</option>))}
+                  </select>
+                </div>
               </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Category
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      category: e.target.value as Category,
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {CATEGORY_CONFIG[c].label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Level */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                  Proficiency
-                </label>
-                <select
-                  value={formData.level}
-                  onChange={(e) =>
-                    setFormData({ ...formData, level: e.target.value as Level })
-                  }
-                  className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 transition"
-                >
-                  {LEVELS.map((l) => (
-                    <option key={l} value={l}>
-                      {LEVEL_CONFIG[l].label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Actions */}
-              <div className="sm:col-span-3 flex gap-2 pt-1">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 disabled:opacity-50 transition-colors"
-                >
-                  <Check size={14} />
-                  {saving
-                    ? "Saving…"
-                    : editingId
-                      ? "Update Skill"
-                      : "Add Skill"}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={resetForm} className="px-6 py-2 text-sm font-bold text-slate-500">Cancel</button>
+                <button type="submit" disabled={saving} className="px-8 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-50">
+                  {saving ? "Saving..." : editingId ? "Update Skill" : "Add Skill"}
                 </button>
               </div>
             </form>
@@ -394,102 +274,52 @@ export default function AdminSkills() {
         )}
       </AnimatePresence>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 flex-wrap">
-        {(["all", ...CATEGORIES] as const).map((tab) => {
-          const isAll = tab === "all";
-          const cfg = !isAll ? CATEGORY_CONFIG[tab] : null;
-          const count = isAll
-            ? skills.length
-            : skills.filter((s) => s.category === tab).length;
-          return (
+      {/* Filter Tabs & List */}
+      <div className="space-y-6">
+        <div className="flex gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-2xl w-fit">
+          {(["all", ...CATEGORIES] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                activeTab === tab
-                  ? isAll
-                    ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-transparent"
-                    : `${cfg!.bg} ${cfg!.color} ${cfg!.border}`
-                  : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === tab ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
             >
-              {isAll ? "All" : cfg!.label}
-              <span className="opacity-70">{count}</span>
+              {tab}
             </button>
-          );
-        })}
-      </div>
-
-      {/* Skills Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse"
-            />
           ))}
         </div>
-      ) : filteredSkills.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-          <p className="text-sm">
-            No skills yet. Click <strong>Add Skill</strong> to get started.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filteredSkills.map((skill) => {
-            const cat =
-              CATEGORY_CONFIG[skill.category as Category] ||
-              CATEGORY_CONFIG.tools;
-            const level =
-              LEVEL_CONFIG[(skill.level || "intermediate") as Level] ||
-              LEVEL_CONFIG.intermediate;
-            return (
-              <motion.div
-                key={skill.id}
-                layout
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="group flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm transition-all"
-              >
-                <SkillIcon name={skill.name} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{skill.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span
-                      className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${cat.bg} ${cat.color}`}
-                    >
-                      {cat.label}
-                    </span>
-                    <LevelDots
-                      level={(skill.level || "intermediate") as Level}
-                    />
-                    <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                      {level.label}
-                    </span>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((n) => (<div key={n} className="h-20 rounded-2xl bg-slate-100 dark:bg-white/5 animate-pulse" />))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredSkills.map((skill) => {
+              const cfg = CATEGORY_CONFIG[skill.category as Category] || CATEGORY_CONFIG.tools;
+              return (
+                <motion.div
+                  key={skill.id}
+                  layout
+                  className="group flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 hover:border-indigo-500/30 transition-all shadow-sm"
+                >
+                  <SkillIcon name={skill.name} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{skill.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <LevelDots level={(skill.level || "intermediate") as Level} />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{skill.level || "intermediate"}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-shrink-0">
-                  <button
-                    onClick={() => startEdit(skill)}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <Edit2 size={13} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(skill.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEdit(skill)} className="p-2 text-slate-400 hover:text-indigo-500 transition-colors"><Edit2 size={14} /></button>
+                    <button onClick={() => handleDelete(skill.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }

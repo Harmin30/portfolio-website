@@ -24,8 +24,8 @@ export async function GET() {
           bio: "Full Stack Developer",
           github: process.env.NEXT_PUBLIC_PORTFOLIO_GITHUB,
           linkedin: process.env.NEXT_PUBLIC_PORTFOLIO_LINKEDIN,
-          twitter: process.env.NEXT_PUBLIC_PORTFOLIO_TWITTER,
           email: process.env.NEXT_PUBLIC_PORTFOLIO_EMAIL,
+          leetcode: "",
         },
         { status: 200 },
       );
@@ -44,7 +44,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, title, bio, github, linkedin, twitter, email, hero_image } =
+    const { name, title, bio, github, linkedin, email, leetcode, hero_image } =
       body;
 
     // First, check if profile exists
@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
           bio,
           github,
           linkedin,
-          twitter,
           email,
+          leetcode,
           hero_image,
           updated_at: new Date().toISOString(),
         })
@@ -82,21 +82,29 @@ export async function POST(request: NextRequest) {
             bio,
             github,
             linkedin,
-            twitter,
             email,
+            leetcode,
             hero_image,
           },
         ])
         .select();
     }
 
-    if (result.error) throw result.error;
+    if (result.error) {
+      console.error("Supabase error:", result.error);
+      throw new Error(result.error.message || "Database error");
+    }
+
+    if (!result.data || result.data.length === 0) {
+      throw new Error("No data returned from database");
+    }
 
     return NextResponse.json(result.data[0], { status: 200 });
   } catch (error) {
-    console.error("Error saving profile:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error saving profile:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to save profile" },
+      { error: "Failed to save profile", details: errorMessage },
       { status: 500 },
     );
   }
