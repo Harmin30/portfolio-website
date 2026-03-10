@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌟 Modern Portfolio Website
 
-## Getting Started
+A production-ready, fully responsive portfolio website built with cutting-edge web technologies. Perfect for developers, designers, and creative professionals who want to showcase their work professionally.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0-38B2AC?style=flat)
+![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat)
+
+## ✨ Features
+
+### 🎨 Frontend
+- **Modern Design**: Clean, professional, and visually appealing UI
+- **Fully Responsive**: Works seamlessly on mobile, tablet, and desktop
+- **Dark Mode**: Built-in dark/light theme toggle
+- **Smooth Animations**: Framer Motion animations for enhanced UX
+- **Fast Performance**: Optimized with Next.js 14
+- **SEO Optimized**: Meta tags, open graph included
+
+### 📱 Pages Included
+1. **Home**: Hero section with typing effect
+2. **About**: Biography, education, and experience timeline
+3. **Projects**: Showcase of your best works
+4. **Skills**: Categorized technical skills
+5. **Contact**: Contact form with validation
+6. **Blog**: Publish articles and insights
+
+### 🔐 Admin Dashboard
+- Secure Authentication with Supabase
+- Project Management (CRUD)
+- Skills Manager
+- Blog System
+- Message Management
+
+### 🛠 Tech Stack
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **Icons**: Lucide React
+- **Animations**: Framer Motion
+- **Database**: Supabase
+- **Auth**: Supabase Auth
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Supabase account (free)
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📖 Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[Setup & Deployment Guide](./SETUP_GUIDE.md)** - Complete setup instructions
+- Environment variables configuration
+- Supabase database setup
+- Deployment to Vercel/Netlify
 
-## Learn More
+## 🔧 Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+SUPABASE_SERVICE_ROLE_KEY=your_key
+NEXT_PUBLIC_PORTFOLIO_NAME=Your Name
+NEXT_PUBLIC_PORTFOLIO_TITLE=Your Title
+NEXT_PUBLIC_PORTFOLIO_EMAIL=your@email.com
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See `.env.local.example` for all variables.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚢 Deployment
 
-## Deploy on Vercel
+### Vercel (Recommended)
+- Push to GitHub
+- Import on Vercel
+- Set environment variables
+- Deploy!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Netlify
+- Connect GitHub repo
+- Configure build settings
+- Add environment variables
+- Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed instructions.
+
+## 📊 Features Checklist
+
+- ✅ Responsive design
+- ✅ Dark mode
+- ✅ Animations
+- ✅ Admin dashboard
+- ✅ Database integration
+- ✅ Authentication
+- ✅ Contact form
+- ✅ Blog system
+- ✅ SEO optimized
+- ✅ Production ready
+
+## 📄 License
+
+MIT License
+
+---
+
+**[→ Get Started with Setup Guide](./SETUP_GUIDE.md)**
+
