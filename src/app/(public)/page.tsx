@@ -171,10 +171,10 @@ export default function Home() {
               <div className="relative h-full w-full rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0a] p-3 md:p-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
                 <div className="relative h-full w-full rounded-[1.4rem] md:rounded-[1.8rem] overflow-hidden">
                   <Image
-                    src="/profile.JPG"
+                    src={profile.hero_image || "/profile.JPG"}
                     fill
                     alt={profile.name}
-                    priority
+                    priority={!profile.hero_image}
                     sizes="(max-width: 768px) 260px, (max-width: 1024px) 320px, 320px"
                     className="object-cover transition-transform duration-[2.5s] ease-out group-hover:scale-110"
                   />

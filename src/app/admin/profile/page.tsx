@@ -5,13 +5,15 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Profile } from "@/types";
-import { Loader, Save } from "lucide-react";
+import { Loader, Save, Upload } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function AdminProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     title: "",
@@ -20,6 +22,7 @@ export default function AdminProfile() {
     linkedin: "",
     twitter: "",
     email: "",
+    hero_image: "",
   });
 
   useEffect(() => {
@@ -40,6 +43,7 @@ export default function AdminProfile() {
         linkedin: data.linkedin || "",
         twitter: data.twitter || "",
         email: data.email || "",
+        hero_image: data.hero_image || "",
       });
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -56,6 +60,42 @@ export default function AdminProfile() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append("file", file);
+      formDataObj.append("folder", "profile");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataObj,
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+      const { url } = await response.json();
+
+      setFormData({
+        ...formData,
+        hero_image: url,
+      });
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,6 +189,37 @@ export default function AdminProfile() {
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
                 placeholder="Tell visitors about yourself"
               />
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-2">Profile Photo</label>
+              <div className="space-y-3">
+                {formData.hero_image && (
+                  <div className="relative w-32 h-40 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+                    <Image
+                      src={formData.hero_image}
+                      alt="Profile preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUploadingImage}
+                    className="flex-1 px-4 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer"
+                  />
+                  {isUploadingImage && (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Uploading...</span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Upload your homepage profile photo here. Image will appear on the home page.
+                </p>
+              </div>
             </div>
 
             <div>
