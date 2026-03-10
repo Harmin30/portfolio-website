@@ -10,13 +10,18 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from("skills")
-      .select("*")
+      .select("id, category, name")
       .order("category", { ascending: true })
       .order("name", { ascending: true });
 
     if (error) throw error;
 
-    return NextResponse.json(data || [], { status: 200 });
+    const response = NextResponse.json(data || [], { status: 200 });
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching skills:", error);
     return NextResponse.json(

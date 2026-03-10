@@ -13,12 +13,17 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from("contact_messages")
-      .select("*")
+      .select("id, created_at, read")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    return NextResponse.json(data || [], { status: 200 });
+    const response = NextResponse.json(data || [], { status: 200 });
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching messages:", error);
     return NextResponse.json(

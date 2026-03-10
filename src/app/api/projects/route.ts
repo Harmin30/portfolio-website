@@ -6,16 +6,22 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabase = createClient(supabaseUrl || "", supabaseServiceKey || "");
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const { data, error } = await supabase
       .from("projects")
-      .select("*")
+      .select("id, title, created_at")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    return NextResponse.json(data || [], { status: 200 });
+    const response = NextResponse.json(data || [], { status: 200 });
+    // Cache for 5 minutes on client, 1 hour on CDN
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return NextResponse.json(

@@ -24,11 +24,7 @@ const letter = {
   },
 };
 
-export default function LandingIntro({
-  onFinish,
-}: {
-  onFinish: () => void;
-}) {
+export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onFinish();
@@ -60,7 +56,6 @@ export default function LandingIntro({
       />
 
       <div className="relative text-center">
-
         {/* top line */}
         <motion.div
           initial={{ scaleX: 0 }}
@@ -77,11 +72,7 @@ export default function LandingIntro({
           className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-[0.2em]"
         >
           {name.map((char, i) => (
-            <motion.span
-              key={i}
-              variants={letter}
-              className="inline-block"
-            >
+            <motion.span key={i} variants={letter} className="inline-block">
               {char === " " ? "\u00A0" : char}
             </motion.span>
           ))}
@@ -120,7 +111,6 @@ export default function LandingIntro({
           transition={{ delay: 0.4, duration: 0.6 }}
           className="origin-right h-[2px] bg-white/70 mx-auto mt-6 w-[160px]"
         />
-
       </div>
     </motion.div>
   );

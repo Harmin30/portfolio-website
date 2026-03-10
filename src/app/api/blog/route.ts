@@ -20,11 +20,18 @@ export async function GET(request: NextRequest) {
       query = query.eq("published", true);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.select(
+      "id, title, published_at, published",
+    );
 
     if (error) throw error;
 
-    return NextResponse.json(data || [], { status: 200 });
+    const response = NextResponse.json(data || [], { status: 200 });
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching blog posts:", error);
     return NextResponse.json(
