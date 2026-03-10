@@ -45,6 +45,8 @@ export default function Home() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [about, setAbout] = useState<About | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  // Track if the actual image file has finished downloading
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const technologies = [
     "Next.js",
@@ -176,7 +178,6 @@ export default function Home() {
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         VIEW PROJECTS <ArrowRight size={14} />
                       </span>
-                      {/* Projects Fill: Upward */}
                       <div className="absolute inset-0 z-0 bg-zinc-900 dark:bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                     </motion.button>
                   </Link>
@@ -189,30 +190,47 @@ export default function Home() {
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         GET IN TOUCH <ArrowRight size={14} />
                       </span>
-                      {/* Contact Fill: Downward */}
                       <div className="absolute inset-0 z-0 bg-zinc-900 dark:bg-white -translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                     </motion.button>
                   </Link>
                 </motion.div>
               </div>
 
-              {/* --- IMAGE COLUMN --- */}
+              {/* --- IMAGE COLUMN WITH SMOOTH LOADING --- */}
               <motion.div
                 variants={photoPortalReveal}
                 className="w-full lg:col-span-5 order-1 lg:order-2 flex justify-center lg:justify-end"
               >
                 <div className="relative group">
                   <div className="relative w-44 h-44 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full p-2 border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-sm shadow-2xl overflow-hidden">
-                    <div className="relative h-full w-full rounded-full overflow-hidden">
+                    
+                    {/* Placeholder Loader: Shown only while image is downloading */}
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
+                        <Loader className="animate-spin text-zinc-400" size={24} />
+                      </div>
+                    )}
+
+                    <motion.div 
+                      className="relative h-full w-full rounded-full overflow-hidden"
+                      initial={{ opacity: 0, filter: "blur(10px)" }}
+                      animate={{ 
+                        opacity: imageLoaded ? 1 : 0, 
+                        filter: imageLoaded ? "blur(0px)" : "blur(10px)" 
+                      }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
                       <Image
                         src={about?.profile_photo || "/profile.JPG"}
                         fill
                         alt={profile.name}
                         className="object-cover"
                         priority
+                        onLoadingComplete={() => setImageLoaded(true)}
                       />
-                    </div>
+                    </motion.div>
                   </div>
+                  
                   <motion.div
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 4, repeat: Infinity }}
