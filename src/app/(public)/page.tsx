@@ -148,7 +148,7 @@ export default function Home() {
                   </span>
                 </motion.button>
               </Link>
-              
+
               <Link href="/contact" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ y: -3 }}

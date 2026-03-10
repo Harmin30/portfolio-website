@@ -92,14 +92,15 @@ export default function Projects() {
     );
   }, [search, projects]);
 
-  if (isLoading) return (
-    <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
-      <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
+        <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+      </div>
+    );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
       animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -118,18 +119,28 @@ export default function Projects() {
       >
         <header className="relative mb-10 md:mb-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <motion.div variants={itemVariants} className="space-y-4 text-center md:text-left">
+            <motion.div
+              variants={itemVariants}
+              className="space-y-4 text-center md:text-left"
+            >
               <div className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold mx-auto md:mx-0">
                 <Sparkles size={16} />
-                <span className="text-[10px] uppercase tracking-[0.4em]">Selected.Works</span>
+                <span className="text-[10px] uppercase tracking-[0.4em]">
+                  Selected.Works
+                </span>
               </div>
               <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] uppercase">
                 Crafting <br />
-                <span className="text-zinc-300 dark:text-zinc-800 italic font-medium">Solutions.</span>
+                <span className="text-zinc-300 dark:text-zinc-800 italic font-medium">
+                  Solutions.
+                </span>
               </h1>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="relative group w-full md:w-72">
+            <motion.div
+              variants={itemVariants}
+              className="relative group w-full md:w-72"
+            >
               <div className="relative flex items-center bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 transition-all group-focus-within:border-purple-500/50 shadow-sm">
                 <Search className="text-zinc-400 mr-2" size={16} />
                 <input
@@ -144,7 +155,10 @@ export default function Projects() {
           </div>
         </header>
 
-        <motion.div variants={containerVariants} className="grid grid-cols-1 gap-6 md:gap-10">
+        <motion.div
+          variants={containerVariants}
+          className="grid grid-cols-1 gap-6 md:gap-10"
+        >
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project) => (
               <motion.div
@@ -156,14 +170,15 @@ export default function Projects() {
               >
                 {/* COMPACT CARD DESIGN FOR MOBILE */}
                 <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl">
-                  
                   {/* Smaller Responsive Image */}
                   <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
                     {project.image ? (
                       <ProjectImage src={project.image} alt={project.title} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">No Image</span>
+                        <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
+                          No Image
+                        </span>
                       </div>
                     )}
                   </div>
@@ -179,12 +194,22 @@ export default function Projects() {
 
                       <div className="flex gap-2">
                         {project.github_url && (
-                          <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
+                          <a
+                            href={project.github_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                          >
                             <Github size={16} />
                           </a>
                         )}
                         {project.live_url && (
-                          <a href={project.live_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 transition-all shadow-lg">
+                          <a
+                            href={project.live_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 transition-all shadow-lg"
+                          >
                             <ArrowUpRight size={18} />
                           </a>
                         )}

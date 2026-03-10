@@ -139,7 +139,8 @@ export default function AdminSkills() {
       if (error) throw new Error(error.message);
       setSkills(data || []);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch skills";
+      const message =
+        err instanceof Error ? err.message : "Failed to fetch skills";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -169,7 +170,8 @@ export default function AdminSkills() {
       resetForm();
       await fetchSkills();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to save skill";
+      const message =
+        err instanceof Error ? err.message : "Failed to save skill";
       toast.error(message);
     } finally {
       setSaving(false);
@@ -184,7 +186,8 @@ export default function AdminSkills() {
       toast.success("Skill deleted!");
       await fetchSkills();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete skill";
+      const message =
+        err instanceof Error ? err.message : "Failed to delete skill";
       toast.error(message);
     }
   };

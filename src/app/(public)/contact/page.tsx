@@ -3,14 +3,7 @@
 import { useState, useEffect } from "react";
 // 1. Added Variants type here
 import { motion, Variants } from "framer-motion";
-import {
-  Mail,
-  Github,
-  Linkedin,
-  Send,
-  Sparkles,
-  Loader2,
-} from "lucide-react";
+import { Mail, Github, Linkedin, Send, Sparkles, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 // 2. Applied Variants type to fix red squiggles
@@ -78,14 +71,15 @@ export default function Contact() {
   };
 
   // Consistent loader from Skills page
-  if (isInitialLoading) return (
-    <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
-      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-    </div>
-  );
+  if (isInitialLoading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
+        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+      </div>
+    );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
       animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}

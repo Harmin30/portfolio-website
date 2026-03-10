@@ -62,7 +62,8 @@ export default function AdminDashboard() {
       icon: Briefcase,
       href: "/admin/projects",
       gradient: "from-blue-500 to-cyan-500",
-      bgGradient: "from-blue-50 dark:from-blue-950/30 to-cyan-50 dark:to-cyan-950/30",
+      bgGradient:
+        "from-blue-50 dark:from-blue-950/30 to-cyan-50 dark:to-cyan-950/30",
     },
     {
       title: "Skills",
@@ -70,7 +71,8 @@ export default function AdminDashboard() {
       icon: Zap,
       href: "/admin/skills",
       gradient: "from-purple-500 to-pink-500",
-      bgGradient: "from-purple-50 dark:from-purple-950/30 to-pink-50 dark:to-pink-950/30",
+      bgGradient:
+        "from-purple-50 dark:from-purple-950/30 to-pink-50 dark:to-pink-950/30",
     },
     {
       title: "Messages",
@@ -78,7 +80,8 @@ export default function AdminDashboard() {
       icon: MessageSquare,
       href: "/admin/messages",
       gradient: "from-emerald-500 to-teal-500",
-      bgGradient: "from-emerald-50 dark:from-emerald-950/30 to-teal-50 dark:to-teal-950/30",
+      bgGradient:
+        "from-emerald-50 dark:from-emerald-950/30 to-teal-50 dark:to-teal-950/30",
     },
     {
       title: "Blog Posts",
@@ -86,7 +89,8 @@ export default function AdminDashboard() {
       icon: BookOpen,
       href: "/admin/blog",
       gradient: "from-amber-500 to-orange-500",
-      bgGradient: "from-amber-50 dark:from-amber-950/30 to-orange-50 dark:to-orange-950/30",
+      bgGradient:
+        "from-amber-50 dark:from-amber-950/30 to-orange-50 dark:to-orange-950/30",
     },
   ];
 
@@ -131,7 +135,8 @@ export default function AdminDashboard() {
           </h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 text-lg">
-          Here's an overview of your portfolio activity and quick access to management tools.
+          Here's an overview of your portfolio activity and quick access to
+          management tools.
         </p>
       </motion.div>
 
@@ -148,7 +153,10 @@ export default function AdminDashboard() {
             <motion.div key={i} variants={itemVariants}>
               <Link href={card.href}>
                 <motion.div
-                  whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                  }}
                   className={`h-full p-6 bg-gradient-to-br ${card.bgGradient} border border-white/20 dark:border-slate-700/50 rounded-2xl backdrop-blur-sm hover:border-white/40 dark:hover:border-slate-600 transition-all duration-300 cursor-pointer group`}
                 >
                   <div className="flex items-start justify-between mb-6">
@@ -201,7 +209,10 @@ export default function AdminDashboard() {
       >
         <div className="p-6 border-b border-white/20 dark:border-slate-700/50">
           <div className="flex items-center gap-2">
-            <TrendingUp size={24} className="text-blue-600 dark:text-blue-400" />
+            <TrendingUp
+              size={24}
+              className="text-blue-600 dark:text-blue-400"
+            />
             <h2 className="text-2xl font-black text-slate-900 dark:text-white">
               Quick Actions
             </h2>
@@ -240,7 +251,10 @@ export default function AdminDashboard() {
                     whileTap={{ scale: 0.95 }}
                     className={`w-full p-4 bg-gradient-to-r ${action.color} hover:shadow-lg text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group shadow-md`}
                   >
-                    <ActionIcon size={20} className="group-hover:rotate-12 transition-transform" />
+                    <ActionIcon
+                      size={20}
+                      className="group-hover:rotate-12 transition-transform"
+                    />
                     <span>{action.label}</span>
                   </motion.button>
                 </Link>
@@ -264,7 +278,10 @@ export default function AdminDashboard() {
         >
           <div className="p-6 border-b border-white/20 dark:border-slate-700/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={20} className="text-blue-600 dark:text-blue-400" />
+              <CheckCircle2
+                size={20}
+                className="text-blue-600 dark:text-blue-400"
+              />
               <h3 className="font-bold text-slate-900 dark:text-white">
                 Getting Started
               </h3>
@@ -303,7 +320,10 @@ export default function AdminDashboard() {
         >
           <div className="p-6 border-b border-white/20 dark:border-slate-700/50 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
             <div className="flex items-center gap-2">
-              <Clock size={20} className="text-purple-600 dark:text-purple-400" />
+              <Clock
+                size={20}
+                className="text-purple-600 dark:text-purple-400"
+              />
               <h3 className="font-bold text-slate-900 dark:text-white">
                 Portfolio Summary
               </h3>
@@ -350,7 +370,8 @@ export default function AdminDashboard() {
         className="text-center p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50"
       >
         <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-          💡 <span className="font-bold">Tip:</span> Use the sidebar navigation to access all management features
+          💡 <span className="font-bold">Tip:</span> Use the sidebar navigation
+          to access all management features
         </p>
       </motion.div>
     </motion.div>

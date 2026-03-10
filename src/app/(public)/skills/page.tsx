@@ -9,13 +9,25 @@ const categories = ["frontend", "backend", "database", "tools"] as const;
 
 const getIconSlug = (name: string) => {
   const map: Record<string, string> = {
-    "js": "javascript", "javascript": "javascript", "ts": "typescript", "typescript": "typescript",
-    "react": "react", "next": "nextdotjs", "nextjs": "nextdotjs", "node": "nodedotjs",
-    "mongodb": "mongodb", "postgresql": "postgresql", "mysql": "mysql", "html": "html5",
-    "css": "css3", "tailwind": "tailwindcss", "git": "git", "docker": "docker",
+    js: "javascript",
+    javascript: "javascript",
+    ts: "typescript",
+    typescript: "typescript",
+    react: "react",
+    next: "nextdotjs",
+    nextjs: "nextdotjs",
+    node: "nodedotjs",
+    mongodb: "mongodb",
+    postgresql: "postgresql",
+    mysql: "mysql",
+    html: "html5",
+    css: "css3",
+    tailwind: "tailwindcss",
+    git: "git",
+    docker: "docker",
   };
   const normalized = name.toLowerCase().trim();
-  return map[normalized] || normalized.replace(/\s+/g, '');
+  return map[normalized] || normalized.replace(/\s+/g, "");
 };
 
 export default function Skills() {
@@ -38,21 +50,22 @@ export default function Skills() {
     if (window.innerWidth > 1024) {
       setMousePos({
         x: (e.clientX / window.innerWidth - 0.5) * 10,
-        y: (e.clientY / window.innerHeight - 0.5) * 10
+        y: (e.clientY / window.innerHeight - 0.5) * 10,
       });
     }
   }, []);
 
   const filteredSkills = skills.filter((s) => s.category === activeCat);
 
-  if (isLoading) return (
-    <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
-      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white dark:bg-[#050505]">
+        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+      </div>
+    );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
       animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -62,20 +75,20 @@ export default function Skills() {
       {/* --- PREMIUM BACKGROUND ENGINE - MATCHES OTHER PAGES --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <motion.div 
+        <motion.div
           animate={{ x: mousePos.x * 3, y: mousePos.y * 3 }}
-          className="absolute top-[-15%] right-[-5%] w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-600/5 rounded-full blur-[120px]" 
+          className="absolute top-[-15%] right-[-5%] w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-600/5 rounded-full blur-[120px]"
         />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* --- DYNAMIC KINETIC HEADER --- */}
         <header className="mb-16 md:mb-24">
-          <motion.div 
-             initial={{ x: -20, opacity: 0 }}
-             animate={{ x: 0, opacity: 1 }}
-             transition={{ delay: 0.4 }}
-             className="space-y-4 text-center md:text-left"
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-4 text-center md:text-left"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50">
               <Star size={14} className="text-blue-600 fill-blue-600" />
@@ -83,21 +96,24 @@ export default function Skills() {
                 Tech.Stack
               </span>
             </div>
-            
+
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none uppercase">
               My <br className="md:hidden" />
-              <span className="text-zinc-300 dark:text-zinc-800 italic font-medium">Capabilities.</span>
+              <span className="text-zinc-300 dark:text-zinc-800 italic font-medium">
+                Capabilities.
+              </span>
             </h1>
-            
+
             <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto md:mx-0 text-base md:text-lg font-light">
-              A curated collection of technologies and frameworks I use to bridge the gap between complex logic and elegant design.
+              A curated collection of technologies and frameworks I use to
+              bridge the gap between complex logic and elegant design.
             </p>
           </motion.div>
         </header>
 
         <div className="flex flex-col lg:grid lg:grid-cols-[200px_1fr] gap-12 items-start">
           {/* --- SIDEBAR NAV - FIXED RESPONSIVENESS --- */}
-          <motion.nav 
+          <motion.nav
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.7 }}
@@ -106,31 +122,47 @@ export default function Skills() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onMouseEnter={() => { if(window.innerWidth > 1024) setActiveCat(cat) }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 1024) setActiveCat(cat);
+                }}
                 onClick={() => setActiveCat(cat)}
                 className="group relative flex-shrink-0 lg:w-full text-left py-3 md:py-4 px-5 rounded-xl transition-all"
               >
                 <div className="relative z-10 flex items-center justify-between gap-4">
-                  <span className={`text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black transition-all ${
-                    activeCat === cat ? "text-blue-600" : "text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-900 dark:group-hover:text-zinc-200"
-                  }`}>
+                  <span
+                    className={`text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black transition-all ${
+                      activeCat === cat
+                        ? "text-blue-600"
+                        : "text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-900 dark:group-hover:text-zinc-200"
+                    }`}
+                  >
                     {cat}
                   </span>
-                  <Activity size={10} className={`hidden lg:block transition-all ${activeCat === cat ? "text-blue-600 opacity-100" : "opacity-0 -translate-x-2"}`} />
+                  <Activity
+                    size={10}
+                    className={`hidden lg:block transition-all ${activeCat === cat ? "text-blue-600 opacity-100" : "opacity-0 -translate-x-2"}`}
+                  />
                 </div>
                 {activeCat === cat && (
-                  <motion.div layoutId="nav-pill" className="absolute inset-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-xl" />
+                  <motion.div
+                    layoutId="nav-pill"
+                    className="absolute inset-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-xl"
+                  />
                 )}
               </button>
             ))}
           </motion.nav>
 
           {/* --- COMPACT GRID --- */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            style={{ rotateY: mousePos.x / 6, rotateX: -mousePos.y / 6, perspective: "1200px" }}
+            style={{
+              rotateY: mousePos.x / 6,
+              rotateX: -mousePos.y / 6,
+              perspective: "1200px",
+            }}
             className="w-full"
           >
             <AnimatePresence mode="wait">
@@ -150,24 +182,31 @@ export default function Skills() {
                     <div className="relative z-10 flex flex-col gap-5">
                       <div className="flex justify-between items-start">
                         <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-2.5 transition-transform group-hover:rotate-6">
-                          <img 
+                          <img
                             src={`https://cdn.simpleicons.org/${getIconSlug(skill.name)}`}
                             alt={skill.name}
                             className="w-full h-full object-contain dark:brightness-200"
                             onError={(e) => {
-                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.style.display = "none";
                               const parent = e.currentTarget.parentElement;
-                              if (parent) parent.innerHTML = `<span class="text-[10px] font-bold opacity-30 uppercase">${skill.name.charAt(0)}</span>`;
+                              if (parent)
+                                parent.innerHTML = `<span class="text-[10px] font-bold opacity-30 uppercase">${skill.name.charAt(0)}</span>`;
                             }}
                           />
                         </div>
                         <div className="flex gap-[2px]">
                           {[1, 2, 3].map((dot) => (
-                            <div 
+                            <div
                               key={dot}
                               className={`h-1 w-2 md:w-2.5 rounded-full ${
-                                dot <= (skill.level === 'advanced' ? 3 : skill.level === 'intermediate' ? 2 : 1)
-                                ? "bg-blue-600 shadow-[0_0_8px_rgba(59,130,246,0.4)]" : "bg-zinc-200 dark:border-zinc-800"
+                                dot <=
+                                (skill.level === "advanced"
+                                  ? 3
+                                  : skill.level === "intermediate"
+                                    ? 2
+                                    : 1)
+                                  ? "bg-blue-600 shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                                  : "bg-zinc-200 dark:border-zinc-800"
                               }`}
                             />
                           ))}
@@ -180,7 +219,9 @@ export default function Skills() {
                         </h3>
                         <div className="flex items-center gap-1.5 mt-1">
                           <div className="w-1 h-1 rounded-full bg-blue-600 animate-pulse" />
-                          <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest">{skill.level}</span>
+                          <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest">
+                            {skill.level}
+                          </span>
                         </div>
                       </div>
                     </div>
