@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
 import { useDeleteModal } from "@/lib/deleteModal";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default function AdminProjects() {
   const notification = useNotification();
@@ -261,18 +262,18 @@ export default function AdminProjects() {
                     className={inputClass}
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className={labelClass}>Cover Image URL *</label>
-                  <input
-                    type="url"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    required
-                    placeholder="https://..."
-                    className={inputClass}
-                  />
-                </div>
+                <ImageUploader
+                  value={formData.image}
+                  onChange={(url) =>
+                    setFormData({ ...formData, image: url })
+                  }
+                  label="Cover Image *"
+                  placeholder="https://..."
+                  folder="project-images"
+                  required={true}
+                  labelClass={labelClass}
+                  inputClass={inputClass}
+                />
               </div>
 
               <div className="space-y-1">

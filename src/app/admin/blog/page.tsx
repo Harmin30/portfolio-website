@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
 import { useDeleteModal } from "@/lib/deleteModal";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default function AdminBlog() {
   const notification = useNotification();
@@ -255,17 +256,17 @@ export default function AdminBlog() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-1">
-                  <label className={labelClass}>Featured Image URL</label>
-                  <input
-                    type="url"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="https://..."
-                    className={inputClass}
-                  />
-                </div>
+                <ImageUploader
+                  value={formData.image}
+                  onChange={(url) =>
+                    setFormData({ ...formData, image: url })
+                  }
+                  label="Featured Image"
+                  placeholder="https://..."
+                  folder="blog-images"
+                  labelClass={labelClass}
+                  inputClass={inputClass}
+                />
                 <div className="flex items-end pb-1">
                   <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 w-full">
                     <div

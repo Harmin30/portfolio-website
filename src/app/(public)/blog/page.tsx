@@ -26,6 +26,7 @@ const itemVariants: Variants = {
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchPosts();
@@ -51,6 +52,18 @@ export default function Blog() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const handleImageLoad = (postId: string) => {
+    setLoadingImages((prev) => {
+      const updated = new Set(prev);
+      updated.delete(postId);
+      return updated;
+    });
+  };
+
+  const handleImageStart = (postId: string) => {
+    setLoadingImages((prev) => new Set(prev).add(postId));
   };
 
   const featuredPost = posts[0];
@@ -119,12 +132,21 @@ export default function Blog() {
                 className="group relative block"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white/40 dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2.5rem] p-4 md:p-8 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-500 shadow-xl shadow-amber-500/5">
-                  <div className="lg:col-span-7 aspect-[16/9] md:aspect-[21/9] lg:aspect-auto lg:h-[400px] overflow-hidden rounded-2xl md:rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-800">
+                  <div className="lg:col-span-7 aspect-[16/9] md:aspect-[21/9] lg:aspect-auto lg:h-[400px] overflow-hidden rounded-2xl md:rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-800 relative">
+                    {loadingImages.has(`featured-${featuredPost.id}`) && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-zinc-200 to-zinc-100 dark:from-zinc-700 dark:to-zinc-600 animate-pulse" />
+                    )}
                     {featuredPost.image && (
                       <img
                         src={featuredPost.image}
                         alt={featuredPost.title}
-                        className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        onLoadStart={() => handleImageStart(`featured-${featuredPost.id}`)}
+                        onLoad={() => handleImageLoad(`featured-${featuredPost.id}`)}
+                        className={`w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105 ${
+                          loadingImages.has(`featured-${featuredPost.id}`)
+                            ? "opacity-0"
+                            : "opacity-100"
+                        }`}
                       />
                     )}
                   </div>
@@ -175,12 +197,21 @@ export default function Blog() {
                       href={`/blog/${post.slug}`}
                       className="flex flex-col h-full"
                     >
-                      <div className="aspect-[16/10] mb-6 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/50">
+                      <div className="aspect-[16/10] mb-6 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/50 relative">
+                        {loadingImages.has(`post-${post.id}`) && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-zinc-200 to-zinc-100 dark:from-zinc-700 dark:to-zinc-600 animate-pulse" />
+                        )}
                         {post.image && (
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                            onLoadStart={() => handleImageStart(`post-${post.id}`)}
+                            onLoad={() => handleImageLoad(`post-${post.id}`)}
+                            className={`w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 ${
+                              loadingImages.has(`post-${post.id}`)
+                                ? "opacity-0"
+                                : "opacity-80"
+                            }`}
                           />
                         )}
                       </div>
