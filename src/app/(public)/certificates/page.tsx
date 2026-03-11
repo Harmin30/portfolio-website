@@ -36,6 +36,7 @@ export default function Certificates() {
       const { data } = await supabase
         .from("certificates")
         .select("*")
+        .order("is_featured", { ascending: false })
         .order("date_obtained", { ascending: false });
       setCertificates(data || []);
     } catch (err) {
@@ -115,25 +116,64 @@ export default function Certificates() {
                 layout
                 variants={itemVariants}
                 whileHover={{ y: -8 }}
-                className="group"
+                className={`group ${cert.is_featured ? "md:col-span-2 lg:col-span-1" : ""}`}
               >
-                <div className="relative h-full flex flex-col p-4 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/5">
+                <div
+                  className={`relative h-full flex flex-col p-4 md:p-8 rounded-xl md:rounded-[2.5rem] transition-all duration-500 hover:shadow-2xl ${
+                    cert.is_featured
+                      ? "bg-gradient-to-br from-yellow-50 via-yellow-50/50 to-transparent dark:from-yellow-500/15 dark:via-yellow-500/5 dark:to-transparent border border-yellow-200 dark:border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:bg-gradient-to-br hover:from-yellow-100 hover:via-yellow-50 hover:to-transparent dark:hover:from-yellow-500/20 dark:hover:via-yellow-500/10"
+                      : "bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-emerald-500/5"
+                  }`}
+                >
                   <div className="flex justify-between items-start mb-4 md:mb-8">
-                    <div className="p-2 md:p-4 rounded-xl md:rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 transition-all group-hover:rotate-12 group-hover:bg-emerald-600 group-hover:text-white">
-                      <Award size={18} className="md:w-6 md:h-6" />
+                    <div
+                      className={`p-2 md:p-4 rounded-xl md:rounded-2xl transition-all group-hover:rotate-12 ${
+                        cert.is_featured
+                          ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 group-hover:bg-yellow-600 group-hover:text-white"
+                          : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white"
+                      }`}
+                    >
+                      {cert.is_featured ? (
+                        <Star size={18} className="md:w-6 md:h-6" fill="currentColor" />
+                      ) : (
+                        <Award size={18} className="md:w-6 md:h-6" />
+                      )}
                     </div>
-                    <span className="text-[9px] md:text-[10px] font-black text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 md:px-3 py-1 rounded-full uppercase tracking-widest">
-                      {formatDate(cert.date_obtained)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {cert.is_featured && (
+                        <span className="text-[8px] md:text-[9px] font-black text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-500/20 px-2 md:px-3 py-1 rounded-full uppercase tracking-widest border border-yellow-200 dark:border-yellow-500/30">
+                          ⭐ Featured
+                        </span>
+                      )}
+                      <span className="text-[9px] md:text-[10px] font-black text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 md:px-3 py-1 rounded-full uppercase tracking-widest">
+                        {formatDate(cert.date_obtained)}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="mb-6 md:mb-10 space-y-1 md:space-y-2">
-                    <h3 className="text-base md:text-2xl font-black tracking-tight leading-tight group-hover:text-emerald-600 transition-colors">
+                    <h3
+                      className={`text-base md:text-2xl font-black tracking-tight leading-tight transition-colors ${
+                        cert.is_featured
+                          ? "text-yellow-700 dark:text-yellow-300 group-hover:text-yellow-600"
+                          : "group-hover:text-emerald-600"
+                      }`}
+                    >
                       {cert.title}
                     </h3>
                     <div className="flex items-center gap-2">
-                      <div className="h-[1px] w-4 bg-emerald-500" />
-                      <p className="text-emerald-600 dark:text-emerald-400 text-[9px] md:text-[11px] font-black uppercase tracking-widest">
+                      <div
+                        className={`h-[1px] w-4 ${
+                          cert.is_featured ? "bg-yellow-500" : "bg-emerald-500"
+                        }`}
+                      />
+                      <p
+                        className={`text-[9px] md:text-[11px] font-black uppercase tracking-widest ${
+                          cert.is_featured
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : "text-emerald-600 dark:text-emerald-400"
+                        }`}
+                      >
                         {cert.issuer}
                       </p>
                     </div>
@@ -151,12 +191,22 @@ export default function Certificates() {
                       rel="noopener noreferrer"
                       className="flex items-center justify-between group/link"
                     >
-                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover/link:text-zinc-900 dark:group-hover/link:text-white transition-colors">
+                      <span
+                        className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${
+                          cert.is_featured
+                            ? "text-yellow-600 group-hover/link:text-yellow-900 dark:text-yellow-400 dark:group-hover/link:text-yellow-200"
+                            : "text-zinc-400 group-hover/link:text-zinc-900 dark:group-hover/link:text-white"
+                        }`}
+                      >
                         Verify Credential
                       </span>
                       <ExternalLink
                         size={16}
-                        className="md:w-[18px] md:h-[18px] text-zinc-300 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform group-hover/link:text-emerald-500"
+                        className={`md:w-[18px] md:h-[18px] group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform ${
+                          cert.is_featured
+                            ? "text-yellow-400 group-hover/link:text-yellow-600"
+                            : "text-zinc-300 group-hover/link:text-emerald-500"
+                        }`}
                       />
                     </a>
                   </div>

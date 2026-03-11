@@ -73,6 +73,7 @@ export default function Projects() {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
+        .order("display_order", { ascending: true })
         .order("created_at", { ascending: false });
       setProjects(data || []);
     } catch (error) {

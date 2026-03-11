@@ -13,10 +13,40 @@ import {
   ExternalLink,
   Image as ImageIcon,
   Link as LinkIcon,
+  GripVertical,
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
 import { useDeleteModal } from "@/lib/deleteModal";
 import { ImageUploader } from "@/components/ImageUploader";
+
+// Component for displaying project image with skeleton loading
+function ProjectImage({ src, alt }: { src?: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="w-full h-full relative">
+      {!loaded && !error && (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700" />
+      )}
+      {error || !src ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+          <ImageIcon size={40} className="text-slate-300" />
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            loaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function AdminProjects() {
   const notification = useNotification();
@@ -24,8 +54,11 @@ export default function AdminProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -51,6 +84,74 @@ export default function AdminProjects() {
       notification.error("Failed to load projects");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDragStart = (projectId: string) => {
+    setDraggedItem(projectId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, projectId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverItem(projectId);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverItem(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetProjectId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!draggedItem || draggedItem === targetProjectId) {
+      setDraggedItem(null);
+      setDragOverItem(null);
+      return;
+    }
+
+    // Reorder projects locally
+    const draggedIndex = projects.findIndex((p) => p.id === draggedItem);
+    const targetIndex = projects.findIndex((p) => p.id === targetProjectId);
+
+    const newProjects = [...projects];
+    const [draggedProject] = newProjects.splice(draggedIndex, 1);
+    newProjects.splice(targetIndex, 0, draggedProject);
+
+    setProjects(newProjects);
+    setDraggedItem(null);
+    setDragOverItem(null);
+
+    // Save new order to backend
+    await saveProjectOrder(newProjects);
+  };
+
+  const saveProjectOrder = async (orderedProjects: Project[]) => {
+    setIsReordering(true);
+    try {
+      const projectOrders = orderedProjects.map((p, index) => ({
+        id: p.id,
+        display_order: index,
+      }));
+
+      const response = await fetch("/api/projects", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projects: projectOrders }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save project order");
+      notification.success("Project order updated!");
+    } catch (error) {
+      console.error("Error saving project order:", error);
+      notification.error("Failed to update project order");
+      // Revert to previous order
+      fetchProjects();
+    } finally {
+      setIsReordering(false);
     }
   };
 
@@ -209,7 +310,8 @@ export default function AdminProjects() {
             Projects
           </h1>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {projects.length} showcase items in your collection.
+            {projects.length} showcase items in your collection{" "}
+            {isReordering && "• Updating order..."}
           </p>
         </div>
         <button
@@ -405,97 +507,110 @@ export default function AdminProjects() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <motion.div
-              key={project.id}
-              layout
-              className="group bg-white dark:bg-[#16191f] rounded-[2rem] border border-slate-200 dark:border-white/5 overflow-hidden transition-all duration-300 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 dark:hover:shadow-none"
-            >
-              <div className="relative aspect-[16/10] bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                {project.image ? (
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-slate-300">
-                    <ImageIcon size={40} />
+        <div className="space-y-3 mb-4">
+          <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1">
+            📌 Drag projects to reorganize display order
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project) => (
+              <motion.div
+                key={project.id}
+                draggable
+                onDragStart={() => handleDragStart(project.id)}
+                onDragOver={(e) => handleDragOver(e, project.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, project.id)}
+                layout
+                className={`group bg-white dark:bg-[#16191f] rounded-[2rem] border border-slate-200 dark:border-white/5 overflow-hidden transition-all duration-300 cursor-move ${
+                  draggedItem === project.id
+                    ? "opacity-50 border-indigo-500"
+                    : dragOverItem === project.id
+                      ? "border-indigo-500 shadow-2xl shadow-indigo-500/20 scale-105"
+                      : "hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 dark:hover:shadow-none"
+                }`}
+              >
+                {/* Drag Handle */}
+                <div className="absolute top-1 left-1 z-10 opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                  <div className="p-2 bg-indigo-600/80 backdrop-blur rounded-lg text-white">
+                    <GripVertical size={16} />
                   </div>
-                )}
-
-                {/* Status Overlay for Actions */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 pointer-events-none lg:pointer-events-auto" />
-
-                {/* Always visible on mobile, hover on desktop */}
-                <div className="absolute top-4 right-4 flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:translate-y-2 lg:group-hover:translate-y-0 transition-all duration-300">
-                  <button
-                    onClick={() => handleEdit(project)}
-                    className="p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-xl text-slate-600 dark:text-slate-300 hover:text-indigo-600 shadow-xl"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(project.id)}
-                    className="p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-xl text-red-500 hover:bg-red-500 hover:text-white shadow-xl transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-5">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
-                    {project.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 h-8">
-                    {project.description}
-                  </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {project.tech_stack?.slice(0, 3).map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-3 py-1 text-[9px] font-black bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-lg uppercase tracking-widest border border-slate-200 dark:border-white/5"
+                <div className="relative aspect-[16/10] bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                  <ProjectImage src={project.image} alt={project.title} />
+
+                  {/* Status Overlay for Actions */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 pointer-events-none lg:pointer-events-auto" />
+
+                  {/* Always visible on mobile, hover on desktop */}
+                  <div className="absolute top-4 right-4 flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:translate-y-2 lg:group-hover:translate-y-0 transition-all duration-300">
+                    <button
+                      onClick={() => handleEdit(project)}
+                      className="p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-xl text-slate-600 dark:text-slate-300 hover:text-indigo-600 shadow-xl"
                     >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.tech_stack && project.tech_stack.length > 3 && (
-                    <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-lg">
-                      +{project.tech_stack.length - 3} more
-                    </span>
-                  )}
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(project.id)}
+                      className="p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-xl text-red-500 hover:bg-red-500 hover:text-white shadow-xl transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex gap-6 pt-5 border-t border-slate-100 dark:border-white/5">
-                  {project.github_url && (
-                    <a
-                      href={project.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors"
-                    >
-                      <Github size={16} /> Repo
-                    </a>
-                  )}
-                  {project.live_url && (
-                    <a
-                      href={project.live_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors"
-                    >
-                      <ExternalLink size={16} /> Preview
-                    </a>
-                  )}
+                <div className="p-6 space-y-5">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
+                      {project.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 h-8">
+                      {project.description}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {project.tech_stack?.slice(0, 3).map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-3 py-1 text-[9px] font-black bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-lg uppercase tracking-widest border border-slate-200 dark:border-white/5"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {project.tech_stack && project.tech_stack.length > 3 && (
+                      <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-lg">
+                        +{project.tech_stack.length - 3} more
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex gap-6 pt-5 border-t border-slate-100 dark:border-white/5">
+                    {project.github_url && (
+                      <a
+                        href={project.github_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors"
+                      >
+                        <Github size={16} /> Repo
+                      </a>
+                    )}
+                    {project.live_url && (
+                      <a
+                        href={project.live_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors"
+                      >
+                        <ExternalLink size={16} /> Preview
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       )}
     </motion.div>

@@ -48,6 +48,7 @@ export interface Project {
   tech_stack: string[];
   github_url?: string;
   live_url?: string;
+  display_order?: number;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +72,7 @@ export interface Certificate {
   date_obtained: string;
   certificate_url: string;
   description?: string;
+  is_featured?: boolean;
   created_at: string;
   updated_at: string;
 }

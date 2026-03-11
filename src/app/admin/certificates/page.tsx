@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Calendar,
   Building2,
+  Star,
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
 import { useDeleteModal } from "@/lib/deleteModal";
@@ -31,6 +32,7 @@ export default function AdminCertificates() {
     date_obtained: "",
     certificate_url: "",
     description: "",
+    is_featured: false,
   });
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export default function AdminCertificates() {
       const { data, error } = await supabase
         .from("certificates")
         .select("*")
+        .order("is_featured", { ascending: false })
         .order("date_obtained", { ascending: false });
 
       if (error) throw error;
@@ -77,14 +80,28 @@ export default function AdminCertificates() {
       if (editingId) {
         const { error } = await supabase
           .from("certificates")
-          .update(formData)
+          .update({
+            title: formData.title,
+            issuer: formData.issuer,
+            date_obtained: formData.date_obtained,
+            certificate_url: formData.certificate_url,
+            description: formData.description,
+            is_featured: formData.is_featured,
+          })
           .eq("id", editingId);
         if (error) throw error;
         notification.success("Certificate updated!");
       } else {
-        const { error } = await supabase
-          .from("certificates")
-          .insert([formData]);
+        const { error } = await supabase.from("certificates").insert([
+          {
+            title: formData.title,
+            issuer: formData.issuer,
+            date_obtained: formData.date_obtained,
+            certificate_url: formData.certificate_url,
+            description: formData.description,
+            is_featured: formData.is_featured,
+          },
+        ]);
         if (error) throw error;
         notification.success("Certificate added!");
       }
@@ -123,6 +140,7 @@ export default function AdminCertificates() {
       date_obtained: "",
       certificate_url: "",
       description: "",
+      is_featured: false,
     });
     setEditingId(null);
     setShowForm(false);
@@ -273,6 +291,35 @@ export default function AdminCertificates() {
                 />
               </div>
 
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      is_featured: !formData.is_featured,
+                    })
+                  }
+                  className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all ${
+                    formData.is_featured
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+                      : "bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-500/30"
+                  }`}
+                >
+                  {formData.is_featured && (
+                    <Star size={16} fill="currentColor" />
+                  )}
+                </button>
+                <div>
+                  <label className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
+                    Highlight Certificate
+                  </label>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Featured certificates appear first and stand out to visitors
+                  </p>
+                </div>
+              </div>
+
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -319,17 +366,38 @@ export default function AdminCertificates() {
             <motion.div
               key={cert.id}
               layout
-              className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 transition-all hover:border-indigo-500/30 hover:shadow-sm"
+              className={`group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl transition-all hover:shadow-sm ${
+                cert.is_featured
+                  ? "bg-gradient-to-r from-yellow-50 via-yellow-50/50 to-transparent dark:from-yellow-500/10 dark:via-transparent dark:to-transparent border border-yellow-200 dark:border-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                  : "bg-white dark:bg-[#16191f] border border-slate-200 dark:border-white/5 hover:border-indigo-500/30"
+              }`}
             >
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex-shrink-0 border border-indigo-100 dark:border-indigo-500/20">
-                <Award size={22} />
+              <div
+                className={`w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0 border ${
+                  cert.is_featured
+                    ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/40"
+                    : "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20"
+                }`}
+              >
+                {cert.is_featured ? (
+                  <Star size={22} fill="currentColor" />
+                ) : (
+                  <Award size={22} />
+                )}
               </div>
 
               <div className="flex-1 min-w-0 w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                    {cert.title}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                      {cert.title}
+                    </h3>
+                    {cert.is_featured && (
+                      <span className="px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
+                        Featured
+                      </span>
+                    )}
+                  </div>
                   <div className="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                   <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
                     <Building2 size={12} /> {cert.issuer}
@@ -367,6 +435,41 @@ export default function AdminCertificates() {
                 {/* Always visible on mobile, hover effect on lg screens */}
                 <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                   <button
+                    onClick={async () => {
+                      try {
+                        const { error } = await supabase
+                          .from("certificates")
+                          .update({ is_featured: !cert.is_featured })
+                          .eq("id", cert.id);
+                        if (error) throw error;
+                        notification.success(
+                          cert.is_featured
+                            ? "Certificate removed from highlights"
+                            : "Certificate highlighted!",
+                        );
+                        await fetchCertificates();
+                      } catch (error: any) {
+                        notification.error("Failed to update certificate");
+                      }
+                    }}
+                    className={`p-2.5 rounded-xl transition-colors ${
+                      cert.is_featured
+                        ? "text-yellow-500 hover:text-yellow-600"
+                        : "text-slate-400 hover:text-yellow-500"
+                    }`}
+                    title={
+                      cert.is_featured
+                        ? "Remove highlight"
+                        : "Highlight certificate"
+                    }
+                  >
+                    <Star
+                      size={18}
+                      className="sm:size-4"
+                      fill={cert.is_featured ? "currentColor" : "none"}
+                    />
+                  </button>
+                  <button
                     onClick={() => {
                       setFormData({
                         title: cert.title,
@@ -374,6 +477,7 @@ export default function AdminCertificates() {
                         date_obtained: cert.date_obtained,
                         certificate_url: cert.certificate_url,
                         description: cert.description || "",
+                        is_featured: cert.is_featured || false,
                       });
                       setEditingId(cert.id);
                       setShowForm(true);

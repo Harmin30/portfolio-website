@@ -37,8 +37,15 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, description, image, tech_stack, github_url, live_url } =
-      body;
+    const {
+      title,
+      description,
+      image,
+      tech_stack,
+      github_url,
+      live_url,
+      display_order,
+    } = body;
 
     const { data, error } = await supabase
       .from("projects")
@@ -49,6 +56,7 @@ export async function PUT(
         tech_stack: Array.isArray(tech_stack) ? tech_stack : [],
         github_url,
         live_url,
+        display_order: display_order !== undefined ? display_order : undefined,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)

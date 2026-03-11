@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS projects (
   tech_stack TEXT[] DEFAULT ARRAY[]::TEXT[],
   github_url TEXT,
   live_url TEXT,
+  display_order INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS certificates (
   date_obtained DATE NOT NULL,
   certificate_url TEXT NOT NULL,
   description TEXT,
+  is_featured BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
