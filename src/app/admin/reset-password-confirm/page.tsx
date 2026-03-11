@@ -27,6 +27,18 @@ export default function ResetPasswordConfirmPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string }>({});
+
+  // Check password strength
+  const checkPasswordStrength = (password: string) => {
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const isLongEnough = password.length >= 6;
+    return { hasLowercase, hasNumber, isLongEnough };
+  };
+
+  const passwordStrength = checkPasswordStrength(newPassword);
+  const isPasswordStrong = Object.values(passwordStrength).every(v => v);
 
   // Check if Supabase token exists in URL hash
   useEffect(() => {
@@ -58,13 +70,28 @@ export default function ResetPasswordConfirmPage() {
     e.preventDefault();
 
     // Validate passwords
-    if (newPassword !== confirmPassword) {
-      notification.error("Passwords do not match");
-      return;
+    const newErrors: { newPassword?: string; confirmPassword?: string } = {};
+
+    if (!newPassword) {
+      newErrors.newPassword = "Password is required";
+    } else if (!isPasswordStrong) {
+      const { hasLowercase, hasNumber, isLongEnough } = passwordStrength;
+      const missing = [];
+      if (!isLongEnough) missing.push("6+ characters");
+      if (!hasLowercase) missing.push("lowercase letter");
+      if (!hasNumber) missing.push("number");
+      newErrors.newPassword = `Password needs: ${missing.join(", ")}`;
     }
 
-    if (newPassword.length < 6) {
-      notification.error("Password must be at least 6 characters");
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
@@ -203,10 +230,19 @@ export default function ResetPasswordConfirmPage() {
                     <input
                       type={showNewPassword ? "text" : "password"}
                       value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
+                      onChange={(e) => {
+                        setNewPassword(e.target.value);
+                        if (errors.newPassword) {
+                          setErrors({ ...errors, newPassword: "" });
+                        }
+                      }}
                       required
                       disabled={isLoading}
-                      className="w-full bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 disabled:opacity-50"
+                      className={`w-full bg-white dark:bg-black/20 border py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 disabled:opacity-50 ${
+                        errors.newPassword
+                          ? "border-red-500 dark:border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                          : "border-slate-200 dark:border-white/10 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      }`}
                       placeholder="••••••••"
                     />
                     <button
@@ -222,6 +258,41 @@ export default function ResetPasswordConfirmPage() {
                       )}
                     </button>
                   </div>
+                  {errors.newPassword && (
+                    <p className="text-[11px] text-red-500 font-medium ml-1">
+                      {errors.newPassword}
+                    </p>
+                  )}
+                  {/* Password Requirements */}
+                  <div className="text-xs space-y-1.5 mt-3 pl-3 border-l-2 border-slate-200 dark:border-slate-700">
+                    <div
+                      className={
+                        passwordStrength.isLongEnough
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-500"
+                      }
+                    >
+                      {passwordStrength.isLongEnough ? "✓" : "○"} At least 6 characters
+                    </div>
+                    <div
+                      className={
+                        passwordStrength.hasLowercase
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-500"
+                      }
+                    >
+                      {passwordStrength.hasLowercase ? "✓" : "○"} One lowercase letter (a-z)
+                    </div>
+                    <div
+                      className={
+                        passwordStrength.hasNumber
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-500"
+                      }
+                    >
+                      {passwordStrength.hasNumber ? "✓" : "○"} One number (0-9)
+                    </div>
+                  </div>
                 </div>
 
                 {/* Confirm Password Field */}
@@ -233,10 +304,19 @@ export default function ResetPasswordConfirmPage() {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (errors.confirmPassword) {
+                          setErrors({ ...errors, confirmPassword: "" });
+                        }
+                      }}
                       required
                       disabled={isLoading}
-                      className="w-full bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 disabled:opacity-50"
+                      className={`w-full bg-white dark:bg-black/20 border py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 disabled:opacity-50 ${
+                        errors.confirmPassword
+                          ? "border-red-500 dark:border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                          : "border-slate-200 dark:border-white/10 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      }`}
                       placeholder="••••••••"
                     />
                     <button
@@ -254,13 +334,28 @@ export default function ResetPasswordConfirmPage() {
                       )}
                     </button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-[11px] text-red-500 font-medium ml-1">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
+                  {/* Confirm Status */}
+                  {newPassword && confirmPassword && (
+                    <div
+                      className={`text-xs mt-2 pl-3 ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}
+                    >
+                      {newPassword === confirmPassword
+                        ? "✓ Passwords match"
+                        : "✗ Passwords do not match"}
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit Button */}
                 <motion.button
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={isLoading}
+                  disabled={isLoading || !isPasswordStrong || newPassword !== confirmPassword || !confirmPassword}
                   type="submit"
                   className="relative w-full py-3.5 sm:py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl sm:rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                 >

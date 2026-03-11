@@ -31,6 +31,17 @@ export default function AdminSettings() {
 
   const notification = useNotification();
 
+  // Check password strength
+  const checkPasswordStrength = (password: string) => {
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const isLongEnough = password.length >= 6;
+    return { hasLowercase, hasNumber, isLongEnough };
+  };
+
+  const passwordStrength = checkPasswordStrength(newPassword);
+  const isPasswordStrong = Object.values(passwordStrength).every(v => v);
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -40,13 +51,23 @@ export default function AdminSettings() {
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      notification.error("New passwords do not match");
+    if (!newPassword) {
+      notification.error("New password is required");
       return;
     }
 
-    if (newPassword.length < 6) {
-      notification.error("Password must be at least 6 characters");
+    if (!isPasswordStrong) {
+      const { hasLowercase, hasNumber, isLongEnough } = passwordStrength;
+      const missing = [];
+      if (!isLongEnough) missing.push("6+ characters");
+      if (!hasLowercase) missing.push("lowercase letter");
+      if (!hasNumber) missing.push("number");
+      notification.error(`Password needs: ${missing.join(", ")}`);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      notification.error("New passwords do not match");
       return;
     }
 
@@ -279,28 +300,43 @@ export default function AdminSettings() {
                   </button>
                 </div>
                 {/* Password Requirements */}
-                <div className="text-xs space-y-2 mt-3 pl-3">
+                <div className="text-xs space-y-2 mt-3 pl-3 border-l-2 border-slate-200 dark:border-slate-700">
                   <div
-                    className={`flex items-center gap-2 ${newPassword.length >= 6 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+                    className={
+                      passwordStrength.isLongEnough
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-500"
+                    }
                   >
-                    <span className={newPassword.length >= 6 ? "✓" : "○"}>
-                      At least 6 characters
-                    </span>
+                    {passwordStrength.isLongEnough ? "✓" : "○"} At least 6 characters
                   </div>
                   <div
-                    className={`flex items-center gap-2 ${newPassword !== currentPassword && newPassword.length > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}
+                    className={
+                      passwordStrength.hasLowercase
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-500"
+                    }
                   >
-                    <span
-                      className={
-                        newPassword !== currentPassword &&
-                        newPassword.length > 0
-                          ? "✓"
-                          : "○"
-                      }
+                    {passwordStrength.hasLowercase ? "✓" : "○"} One lowercase letter (a-z)
+                  </div>
+                  <div
+                    className={
+                      passwordStrength.hasNumber
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-500"
+                    }
+                  >
+                    {passwordStrength.hasNumber ? "✓" : "○"} One number (0-9)
+                  </div>
+                  {newPassword && confirmPassword && (
+                    <div
+                      className={`mt-2 ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}
                     >
-                      Different from current password
-                    </span>
-                  </div>
+                      {newPassword === confirmPassword
+                        ? "✓ Passwords match"
+                        : "✗ Passwords do not match"}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -336,7 +372,7 @@ export default function AdminSettings() {
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                disabled={isLoading}
+                disabled={isLoading || !currentPassword || !isPasswordStrong || newPassword !== confirmPassword || !confirmPassword || currentPassword === newPassword}
                 type="submit"
                 className="w-full py-3.5 px-6 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-70 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-2 mt-8"
               >

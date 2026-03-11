@@ -22,16 +22,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check password strength
-    const hasUppercase = /[A-Z]/.test(newPassword);
     const hasLowercase = /[a-z]/.test(newPassword);
     const hasNumber = /\d/.test(newPassword);
-    const strongPassword = hasUppercase && hasLowercase && hasNumber;
+    const strongPassword = hasLowercase && hasNumber;
 
     if (!strongPassword) {
       return NextResponse.json(
         {
           message:
-            "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+            "Password must contain at least one lowercase letter and one number",
         },
         { status: 400 },
       );
