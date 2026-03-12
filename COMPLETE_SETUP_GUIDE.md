@@ -5,6 +5,7 @@ A comprehensive step-by-step guide to clone, set up, customize, and deploy your 
 ---
 
 ## 📋 Table of Contents
+
 1. [Prerequisites](#prerequisites)
 2. [Clone the Project](#clone-the-project)
 3. [Supabase Setup](#supabase-setup)
@@ -23,6 +24,7 @@ A comprehensive step-by-step guide to clone, set up, customize, and deploy your 
 ## Prerequisites
 
 Before starting, ensure you have:
+
 - ✅ **Node.js 18+** ([Download](https://nodejs.org/))
 - ✅ **npm** (comes with Node.js)
 - ✅ **Git** ([Download](https://git-scm.com/))
@@ -96,9 +98,11 @@ Visit `http://localhost:3000` to see the portfolio (it will load empty because y
 3. Click **"New Policy"** → **"For INSERT"**
 4. Select **"With custom template"**
 5. Replace the condition with:
+
 ```sql
 (auth.role() = 'authenticated'::text OR auth.role() = 'anon'::text)
 ```
+
 6. Click **"Review"** → **"Save policy"**
 
 ---
@@ -295,11 +299,13 @@ NODE_ENV=development
 ### Get Your Keys
 
 **Supabase Keys:**
+
 1. Supabase Dashboard → Settings → API
 2. Copy your Project URL and Anon Key
 3. Also copy Service Role Key (keep it secret!)
 
 **Resend API (Optional - for contact emails):**
+
 1. Go to [resend.com](https://resend.com)
 2. Sign up
 3. Click "API Keys"
@@ -307,6 +313,7 @@ NODE_ENV=development
 5. Copy the key
 
 **Gmail (Alternative email - Optional):**
+
 1. Log into Gmail
 2. Enable 2-Step Verification if not done
 3. Go to [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
@@ -331,6 +338,7 @@ npm run dev
 Open `http://localhost:3000` in your browser!
 
 You should see:
+
 - ✅ Home page
 - ✅ Navigation menu
 - ✅ Empty sections (because no data yet)
@@ -490,6 +498,7 @@ Done! Your portfolio is now live! 🎉
 ### Automatic Deployments
 
 Every time you push to GitHub:
+
 ```bash
 git add -A
 git commit -m "Updated portfolio"
@@ -515,16 +524,19 @@ Vercel automatically redeploys in 2-5 minutes!
 Emails are optional. Choose one:
 
 **Option A: Resend (Easiest)**
+
 - Already set up if you added keys in `.env.local`
 - Emails go to `RESEND_FROM_EMAIL` address
 - Free tier: 100 emails/day
 
 **Option B: Gmail**
+
 - Already set up if you added Gmail keys
 - Emails go to `GMAIL_USER` email
 - Limited to 100-500 emails/day
 
 **Option C: No Email**
+
 - Messages still saved in Supabase
 - View them in Admin → Messages
 
@@ -533,6 +545,7 @@ Emails are optional. Choose one:
 ## Features & Structure
 
 ### Public Pages (Everyone Can View)
+
 - **Home** (`/`) - Introduction
 - **About** (`/about`) - Bio + Resume download
 - **Projects** (`/projects`) - Showcase work
@@ -542,6 +555,7 @@ Emails are optional. Choose one:
 - **Contact** (`/contact`) - Contact form
 
 ### Admin Dashboard (PIN Protected)
+
 - **Profile** - Basic info
 - **About** - Bio + Timeline
 - **Projects** - Manage projects
@@ -552,6 +566,7 @@ Emails are optional. Choose one:
 - **Settings** - Change PIN
 
 ### Special Features
+
 ✨ Image uploads
 ✨ Dark/Light mode
 ✨ Mobile responsive
@@ -599,24 +614,30 @@ portfolio-website/
 ## Troubleshooting
 
 ### "Cannot connect to Supabase"
+
 **Problem**: Error about Supabase connection
 **Solution**:
+
 1. Check `.env.local` has correct URL and keys
 2. Make sure `.env.local` is in the root folder
 3. Restart dev server: `npm run dev`
 4. Check Supabase dashboard is working
 
 ### "PIN not working"
+
 **Problem**: Can't log into admin
 **Solution**:
+
 1. Clear browser cookies and cache
 2. Try incognito/private browsing
 3. Use forgot PIN: `/admin/forgot-password-pin`
 4. Check console for errors (F12)
 
 ### "Can't upload images"
+
 **Problem**: Image upload fails
 **Solution**:
+
 1. Make sure "portfolio" bucket exists in Supabase Storage
 2. Check storage policies are set
 3. Image must be under 10MB
@@ -624,8 +645,10 @@ portfolio-website/
 5. Restart: `npm run dev`
 
 ### "Modules not found"
+
 **Problem**: `Error: Cannot find module 'react'`
 **Solution**:
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
@@ -633,8 +656,10 @@ npm run dev
 ```
 
 ### "Vercel deployment fails"
+
 **Problem**: Build fails on Vercel
 **Solution**:
+
 1. Check all env vars are set in Vercel
 2. Match exactly with your `.env.local` names
 3. Check Vercel build logs (click the deployment)
@@ -642,24 +667,30 @@ npm run dev
 5. Make sure GitHub repo is connected
 
 ### "Contact form not sending emails"
+
 **Problem**: Messages not emailed
 **Solution**:
+
 1. Check you set `RESEND_API_KEY` or Gmail settings
 2. Verify keys are in Vercel environment
 3. Check Vercel logs for errors
 4. If using Gmail, verify 2-Step is enabled
 
 ### "Blog posts not showing"
+
 **Problem**: Blog page is empty
 **Solution**:
+
 1. Make sure posts are marked `published=true`
 2. Check posts table has data in Supabase
 3. Queries might fail if table is empty
 4. Add a test post first
 
 ### "Dark mode not working"
+
 **Problem**: Can't toggle theme
 **Solution**:
+
 1. Check browser supports dark mode
 2. Clear browser cache
 3. Check browser console for JavaScript errors
@@ -692,6 +723,7 @@ git push                   # Push to GitHub (auto-deploys on Vercel)
 ## Security Notes
 
 🔒 **Never share**:
+
 - `.env.local` file
 - `SUPABASE_SERVICE_ROLE_KEY`
 - Admin PIN
@@ -699,6 +731,7 @@ git push                   # Push to GitHub (auto-deploys on Vercel)
 - Resend API keys
 
 ✅ **Keep safe**:
+
 - Use environment variables (not hardcoded)
 - Don't commit `.env.local` to Git
 - Use `.gitignore` (already configured)
@@ -724,6 +757,7 @@ git push                   # Push to GitHub (auto-deploys on Vercel)
 ## Getting Help
 
 If you get stuck:
+
 1. Read error message carefully
 2. Check console (F12) for details
 3. Review this guide again
@@ -736,16 +770,16 @@ If you get stuck:
 
 ## Quick Reference
 
-| Page | URL | Purpose |
-|------|-----|---------|
-| Home | `/` | Portfolio intro |
-| About | `/about` | Bio + Resume |
-| Projects | `/projects` | Project showcase |
-| Blog | `/blog` | Articles |
-| Skills | `/skills` | Tech stack |
-| Certificates | `/certificates` | Certs |
-| Contact | `/contact` | Contact form |
-| Admin | `/admin` | Dashboard |
+| Page         | URL             | Purpose          |
+| ------------ | --------------- | ---------------- |
+| Home         | `/`             | Portfolio intro  |
+| About        | `/about`        | Bio + Resume     |
+| Projects     | `/projects`     | Project showcase |
+| Blog         | `/blog`         | Articles         |
+| Skills       | `/skills`       | Tech stack       |
+| Certificates | `/certificates` | Certs            |
+| Contact      | `/contact`      | Contact form     |
+| Admin        | `/admin`        | Dashboard        |
 
 ---
 

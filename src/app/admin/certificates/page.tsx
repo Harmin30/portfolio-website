@@ -30,6 +30,8 @@ export default function AdminCertificates() {
     title: "",
     issuer: "",
     date_obtained: "",
+    date_from: "",
+    date_to: "",
     certificate_url: "",
     description: "",
     is_featured: false,
@@ -84,6 +86,8 @@ export default function AdminCertificates() {
             title: formData.title,
             issuer: formData.issuer,
             date_obtained: formData.date_obtained,
+            date_from: formData.date_from || null,
+            date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
             description: formData.description,
             is_featured: formData.is_featured,
@@ -97,6 +101,8 @@ export default function AdminCertificates() {
             title: formData.title,
             issuer: formData.issuer,
             date_obtained: formData.date_obtained,
+            date_from: formData.date_from || null,
+            date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
             description: formData.description,
             is_featured: formData.is_featured,
@@ -138,6 +144,8 @@ export default function AdminCertificates() {
       title: "",
       issuer: "",
       date_obtained: "",
+      date_from: "",
+      date_to: "",
       certificate_url: "",
       description: "",
       is_featured: false,
@@ -275,6 +283,53 @@ export default function AdminCertificates() {
                     placeholder="https://..."
                     className={inputClass}
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>
+                    Course Start Date (Optional)
+                  </label>
+                  <div className="relative">
+                    <Calendar
+                      size={14}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      type="date"
+                      value={formData.date_from}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          date_from: e.target.value,
+                        })
+                      }
+                      className={`${inputClass} pl-10`}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className={labelClass}>
+                    Course End Date (Optional)
+                  </label>
+                  <div className="relative">
+                    <Calendar
+                      size={14}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      type="date"
+                      value={formData.date_to}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          date_to: e.target.value,
+                        })
+                      }
+                      className={`${inputClass} pl-10`}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -475,6 +530,8 @@ export default function AdminCertificates() {
                         title: cert.title,
                         issuer: cert.issuer,
                         date_obtained: cert.date_obtained,
+                        date_from: cert.date_from || "",
+                        date_to: cert.date_to || "",
                         certificate_url: cert.certificate_url,
                         description: cert.description || "",
                         is_featured: cert.is_featured || false,
