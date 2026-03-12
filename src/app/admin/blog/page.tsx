@@ -13,11 +13,12 @@ import {
   Globe,
   EyeOff,
   Calendar,
-  Type,
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
 import { useDeleteModal } from "@/lib/deleteModal";
 import { ImageUploader } from "@/components/ImageUploader";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function AdminBlog() {
   const notification = useNotification();
@@ -39,6 +40,7 @@ export default function AdminBlog() {
 
   useEffect(() => {
     fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchPosts = async () => {
@@ -303,16 +305,16 @@ export default function AdminBlog() {
                 <div className="flex justify-between items-center mb-2">
                   <label className={labelClass}>Article Content</label>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">
-                    Markdown Supported
+                    Markdown & HTML Supported • Paste Formatted Content
                   </span>
                 </div>
                 <textarea
                   name="content"
                   value={formData.content}
                   onChange={handleChange}
-                  rows={12}
-                  placeholder="Write your thoughts here..."
-                  className={`${inputClass} font-mono leading-relaxed resize-none`}
+                  rows={15}
+                  placeholder="Write your thoughts here... You can paste formatted content with bullets, indentation, HTML, or write markdown."
+                  className={`${inputClass} font-mono leading-relaxed resize-none whitespace-pre-wrap`}
                 />
               </div>
 
@@ -391,6 +393,32 @@ export default function AdminBlog() {
                       : "N/A"}
                   </span>
                 </div>
+                {/* Content Preview */}
+                {post.content && (
+                  <div className="mt-2 text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => (
+                          <span className="inline">{children}</span>
+                        ),
+                        ul: ({ children }) => (
+                          <div className="inline">{children}</div>
+                        ),
+                        ol: ({ children }) => (
+                          <div className="inline">{children}</div>
+                        ),
+                        li: ({ children }) => (
+                          <span className="inline">{children}</span>
+                        ),
+                      }}
+                    >
+                      {typeof post.content === "string"
+                        ? post.content.substring(0, 200) + "..."
+                        : ""}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons - Fixed Responsive Visibility */}

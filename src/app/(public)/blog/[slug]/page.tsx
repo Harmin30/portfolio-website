@@ -3,15 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {
-  Calendar,
-  ArrowLeft,
-  Clock,
-  Loader,
-  Share2,
-  ChevronLeft,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, ArrowLeft, Clock, Loader, ChevronLeft } from "lucide-react";
+import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { BlogPost } from "@/types";
 
 export default function BlogArticle() {
@@ -35,7 +32,7 @@ export default function BlogArticle() {
           : null;
         if (!foundPost) throw new Error("Post not found");
         setPost(foundPost);
-      } catch (err) {
+      } catch {
         setError("Article not found");
       } finally {
         setIsLoading(false);
@@ -96,19 +93,6 @@ export default function BlogArticle() {
         animate={{ scaleX: 1 }}
       />
 
-      {/* Floating Navigation */}
-      <nav className="fixed top-8 left-8 z-40 hidden lg:block">
-        <Link
-          href="/blog"
-          className="p-3 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:scale-110 transition-transform flex items-center justify-center group"
-        >
-          <ChevronLeft
-            size={20}
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />
-        </Link>
-      </nav>
-
       <main className="relative pb-24">
         {/* Hero Section */}
         <header className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden bg-zinc-900">
@@ -156,19 +140,143 @@ export default function BlogArticle() {
         <div className="max-w-3xl mx-auto px-6 mt-12 md:mt-20">
           {/* Summary/Excerpt Box */}
           {post.excerpt && (
-            <div className="mb-12 p-6 md:p-8 rounded-3xl bg-zinc-100 dark:bg-zinc-900/50 border-l-4 border-amber-500 italic text-lg md:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-              “{post.excerpt}”
+            <div className="mb-12 p-8 rounded-2xl bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/40 dark:to-zinc-900/60 border-2 border-amber-200 dark:border-amber-900/30 shadow-lg shadow-amber-500/10 dark:shadow-lg dark:shadow-black/20 italic text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+              <span className="text-3xl text-amber-600 dark:text-amber-400 mr-2 select-none">
+                &ldquo;
+              </span>
+              {post.excerpt}
+              <span className="text-3xl text-amber-600 dark:text-amber-400 ml-2 select-none">
+                &rdquo;
+              </span>
             </div>
           )}
           {/* Content Area */}
-          <article
-            className="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none 
-            prose-headings:tracking-tighter prose-headings:font-bold
-            prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-p:text-justify
-            prose-strong:text-zinc-900 dark:prose-strong:text-white
-            prose-img:rounded-3xl prose-img:shadow-2xl"
-          >
-            <div dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+          <article className="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none">
+            <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-3xl border border-zinc-200 dark:border-zinc-800/50 p-8 md:p-12 shadow-lg shadow-zinc-900/5 dark:shadow-lg dark:shadow-black/20">
+              <div className="space-y-6">
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks, remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                  components={{
+                    h1: ({ children }) => (
+                      <h1 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight text-zinc-900 dark:text-white pt-2 pb-4 border-b-2 border-amber-500/30 dark:border-amber-500/20 mt-0 mb-0">
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mt-8 mb-4 pt-2 pb-2 border-l-4 border-amber-500 pl-4">
+                        {children}
+                      </h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mt-6 mb-3">
+                        {children}
+                      </h3>
+                    ),
+                    h4: ({ children }) => (
+                      <h4 className="text-lg font-bold text-zinc-700 dark:text-zinc-200 mt-4 mb-2">
+                        {children}
+                      </h4>
+                    ),
+                    p: ({ children }) => (
+                      <p className="text-zinc-700 dark:text-zinc-300 mb-4 leading-8 text-justify">
+                        {children}
+                      </p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="list-none mb-6 space-y-3 ml-4">
+                        {children}
+                      </ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="list-none mb-6 space-y-3 ml-4 counter-reset: list-counter">
+                        {children}
+                      </ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="text-zinc-700 dark:text-zinc-300 flex items-start gap-3 leading-7">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 dark:bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-400 mt-0.5">
+                          •
+                        </span>
+                        <span>{children}</span>
+                      </li>
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className="border-l-4 border-amber-500 pl-6 my-6 py-4 px-6 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-lg italic text-zinc-600 dark:text-zinc-400 text-base">
+                        {children}
+                      </blockquote>
+                    ),
+                    code: ({ children }) => (
+                      <code className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded font-mono text-sm font-semibold">
+                        {children}
+                      </code>
+                    ),
+                    pre: ({ children }) => (
+                      <pre className="bg-zinc-900 dark:bg-zinc-950 text-zinc-100 p-6 rounded-2xl overflow-x-auto mb-6 border border-zinc-800 dark:border-zinc-700 shadow-lg">
+                        <code className="font-mono text-sm leading-relaxed">
+                          {children}
+                        </code>
+                      </pre>
+                    ),
+                    img: ({ src, alt }) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={src}
+                        alt={alt || "Article image"}
+                        className="rounded-2xl shadow-lg shadow-zinc-900/20 dark:shadow-black/40 my-8 w-full border border-zinc-200 dark:border-zinc-800"
+                      />
+                    ),
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto my-6">
+                        <table className="w-full border-collapse">
+                          {children}
+                        </table>
+                      </div>
+                    ),
+                    thead: ({ children }) => (
+                      <thead className="bg-zinc-100 dark:bg-zinc-800/50">
+                        {children}
+                      </thead>
+                    ),
+                    tbody: ({ children }) => (
+                      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                        {children}
+                      </tbody>
+                    ),
+                    tr: ({ children }) => (
+                      <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                        {children}
+                      </tr>
+                    ),
+                    th: ({ children }) => (
+                      <th className="px-4 py-2 text-left font-bold text-zinc-900 dark:text-white border-b-2 border-zinc-300 dark:border-zinc-700">
+                        {children}
+                      </th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="px-4 py-2 text-zinc-700 dark:text-zinc-300">
+                        {children}
+                      </td>
+                    ),
+                    a: ({ href, children }) => (
+                      <a
+                        href={href}
+                        className="text-amber-600 dark:text-amber-400 font-semibold hover:underline transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {children}
+                      </a>
+                    ),
+                    hr: () => (
+                      <hr className="my-8 border-t-2 border-zinc-200 dark:border-zinc-800" />
+                    ),
+                  }}
+                >
+                  {post.content || ""}
+                </ReactMarkdown>
+              </div>
+            </div>
           </article>
           {/* Footer Social / CTA */}
           {/* Define this at the top of your component or import from a config file */}
