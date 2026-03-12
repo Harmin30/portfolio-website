@@ -61,13 +61,19 @@ export default function AdminCertificates() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if either date_obtained OR date range (date_from AND date_to) is provided
+    const hasDateObtained = !!formData.date_obtained;
+    const hasDateRange = !!formData.date_from && !!formData.date_to;
+
     if (
       !formData.title.trim() ||
       !formData.issuer.trim() ||
-      !formData.date_obtained ||
+      (!hasDateObtained && !hasDateRange) ||
       !formData.certificate_url.trim()
     ) {
-      notification.error("Required fields are missing");
+      notification.error(
+        "Please provide either a date obtained or a course duration (start & end dates)",
+      );
       return;
     }
 
@@ -79,13 +85,20 @@ export default function AdminCertificates() {
     }
 
     try {
+      // Determine the date_obtained value
+      // If date_obtained is provided, use it; otherwise use date_from from the range
+      const finalDateObtained =
+        formData.date_obtained ||
+        formData.date_from ||
+        new Date().toISOString().split("T")[0];
+
       if (editingId) {
         const { error } = await supabase
           .from("certificates")
           .update({
             title: formData.title,
             issuer: formData.issuer,
-            date_obtained: formData.date_obtained,
+            date_obtained: finalDateObtained,
             date_from: formData.date_from || null,
             date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
@@ -100,7 +113,7 @@ export default function AdminCertificates() {
           {
             title: formData.title,
             issuer: formData.issuer,
-            date_obtained: formData.date_obtained,
+            date_obtained: finalDateObtained,
             date_from: formData.date_from || null,
             date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
@@ -248,7 +261,12 @@ export default function AdminCertificates() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-1">
-                  <label className={labelClass}>Date Obtained *</label>
+                  <label className={labelClass}>
+                    Date Obtained
+                    <span className="text-[9px] text-slate-400 ml-1">
+                      (or use duration below)
+                    </span>
+                  </label>
                   <div className="relative">
                     <Calendar
                       size={14}
@@ -263,7 +281,6 @@ export default function AdminCertificates() {
                           date_obtained: e.target.value,
                         })
                       }
-                      required
                       className={`${inputClass} pl-10`}
                     />
                   </div>
@@ -289,7 +306,10 @@ export default function AdminCertificates() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-1">
                   <label className={labelClass}>
-                    Course Start Date (Optional)
+                    Course Start Date
+                    <span className="text-[9px] text-slate-400 ml-1">
+                      (pair with end date)
+                    </span>
                   </label>
                   <div className="relative">
                     <Calendar
@@ -311,7 +331,10 @@ export default function AdminCertificates() {
                 </div>
                 <div className="space-y-1">
                   <label className={labelClass}>
-                    Course End Date (Optional)
+                    Course End Date
+                    <span className="text-[9px] text-slate-400 ml-1">
+                      (pair with start date)
+                    </span>
                   </label>
                   <div className="relative">
                     <Calendar

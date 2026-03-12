@@ -40,16 +40,48 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, issuer, date_obtained, certificate_url, description } = body;
+    const {
+      title,
+      issuer,
+      date_obtained,
+      date_from,
+      date_to,
+      certificate_url,
+      description,
+      is_featured,
+    } = body;
+
+    // Check if either date_obtained OR date range (date_from AND date_to) is provided
+    const hasDateObtained = !!date_obtained;
+    const hasDateRange = !!date_from && !!date_to;
+
+    if (
+      !title ||
+      !issuer ||
+      (!hasDateObtained && !hasDateRange) ||
+      !certificate_url
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Title, issuer, certificate URL, and either a date obtained or course duration (start & end dates) are required",
+        },
+        { status: 400 },
+      );
+    }
 
     const { data, error } = await supabase
       .from("certificates")
       .update({
         title,
         issuer,
-        date_obtained,
+        date_obtained:
+          date_obtained || date_from || new Date().toISOString().split("T")[0],
+        date_from: date_from || null,
+        date_to: date_to || null,
         certificate_url,
         description: description || null,
+        is_featured: is_featured || false,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)

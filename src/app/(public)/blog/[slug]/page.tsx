@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Calendar, ArrowLeft, Clock, Loader, ChevronLeft } from "lucide-react";
+import { Calendar, ArrowLeft, Clock, Loader } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -136,8 +136,22 @@ export default function BlogArticle() {
           </div>
         </header>
 
+        {/* Navigation Back Button */}
+        <div className="max-w-3xl mx-auto px-6 mt-8 md:mt-12 mb-12">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2.5 px-5 py-3 text-sm font-bold text-zinc-700 dark:text-zinc-300 bg-gradient-to-r from-white/60 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/40 hover:from-white hover:to-white/80 dark:hover:from-zinc-900/80 dark:hover:to-zinc-900/60 border border-zinc-300/50 dark:border-zinc-700/50 hover:border-amber-400/50 dark:hover:border-amber-500/40 rounded-xl shadow-sm hover:shadow-md dark:shadow-lg dark:hover:shadow-amber-500/10 transition-all duration-300 group"
+          >
+            <ArrowLeft
+              size={18}
+              className="text-amber-600 dark:text-amber-400 group-hover:-translate-x-1 transition-transform duration-300"
+            />
+            <span>Back to Blog</span>
+          </Link>
+        </div>
+
         {/* Article Body */}
-        <div className="max-w-3xl mx-auto px-6 mt-12 md:mt-20">
+        <div className="max-w-3xl mx-auto px-6">
           {/* Summary/Excerpt Box */}
           {post.excerpt && (
             <div className="mb-12 p-8 rounded-2xl bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/40 dark:to-zinc-900/60 border-2 border-amber-200 dark:border-amber-900/30 shadow-lg shadow-amber-500/10 dark:shadow-lg dark:shadow-black/20 italic text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
@@ -150,6 +164,7 @@ export default function BlogArticle() {
               </span>
             </div>
           )}
+
           {/* Content Area */}
           <article className="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none">
             <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-3xl border border-zinc-200 dark:border-zinc-800/50 p-8 md:p-12 shadow-lg shadow-zinc-900/5 dark:shadow-lg dark:shadow-black/20">
@@ -282,7 +297,7 @@ export default function BlogArticle() {
           {/* Define this at the top of your component or import from a config file */}
 
           <footer className="mt-20 pt-10 border-t border-zinc-100 dark:border-zinc-900">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className="flex justify-center">
               <div className="group flex items-center gap-4 cursor-default">
                 {/* Abstract Icon */}
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-900 dark:bg-black flex items-center justify-center">
@@ -308,17 +323,6 @@ export default function BlogArticle() {
                   </p>
                 </div>
               </div>
-
-              <Link
-                href="/blog"
-                className="group flex items-center gap-2 px-6 py-2.5 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold transition-all hover:bg-zinc-800 dark:hover:bg-zinc-200"
-              >
-                <ArrowLeft
-                  size={14}
-                  className="transition-transform group-hover:-translate-x-1"
-                />
-                Back to Archive
-              </Link>
             </div>
           </footer>
         </div>
