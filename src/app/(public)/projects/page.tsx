@@ -9,6 +9,7 @@ import {
   Command,
   Sparkles,
   Zap,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Project } from "@/types";
@@ -154,6 +155,18 @@ export default function Projects() {
                   onChange={(e) => setSearch(e.target.value)}
                   className="bg-transparent w-full outline-none text-sm placeholder:text-zinc-400 font-medium"
                 />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="ml-2 p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X
+                      className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                      size={16}
+                    />
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>
