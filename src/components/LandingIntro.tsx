@@ -63,13 +63,16 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
     >
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(255,255,255,0.25)_50%)] bg-[length:100%_3px] md:bg-[length:100%_4px]" />
 
+      {/* INTENSIFIED SUCCESS GLOW */}
       <motion.div
         animate={{
-          scale: isComplete ? [1, 1.1, 1] : [1, 1.15, 1],
-          opacity: isComplete ? 0.25 : [0.08, 0.2, 0.08],
+          scale: isComplete ? [1, 1.25, 1] : [1, 1.15, 1],
+          opacity: isComplete ? 0.45 : [0.08, 0.2, 0.08],
         }}
         transition={{ duration: pulseDuration, repeat: Infinity, ease: "easeInOut" }}
-        className={`absolute w-[280px] h-[280px] md:w-[600px] md:h-[600px] blur-[80px] md:blur-[140px] rounded-full transition-colors duration-1000 ${isComplete ? "bg-emerald-500/20" : "bg-blue-600/15"}`}
+        className={`absolute w-[320px] h-[320px] md:w-[700px] md:h-[700px] blur-[100px] md:blur-[160px] rounded-full transition-all duration-1000 ${
+          isComplete ? "bg-emerald-400/30" : "bg-blue-600/15"
+        }`}
       />
 
       <div className="relative flex flex-col items-center z-10 px-4 w-full">
@@ -83,7 +86,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
               >
                 {nameArray.map((char, i) => (
                   <motion.span
-                    key={`${displayName}-${i}`} // Dynamic key ensures re-animation if name changes
+                    key={`${displayName}-${i}`}
                     variants={{
                       hidden: { y: "115%", opacity: 0, skewX: 15, filter: "blur(5px)" },
                       visible: { 
@@ -99,18 +102,19 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                     className="inline-block relative"
                   >
                     {char === " " ? "\u00A0" : char}
+                    
                     <motion.span 
                       animate={{
-                        opacity: isComplete ? [0, 0.3, 0] : [0, 0.4, 0],
-                        left: ["-100%", "200%"]
+                        opacity: isComplete ? [0, 0.6, 0] : [0, 0.7, 0],
+                        left: ["-150%", "250%"]
                       }}
                       transition={{
-                        duration: 1.5,
-                        repeat: isComplete ? 1 : Infinity,
-                        delay: 1 + (i * 0.1),
-                        repeatDelay: 4
+                        duration: 1.2,
+                        repeat: Infinity,
+                        delay: 1 + (i * 0.08),
+                        repeatDelay: 2.5
                       }}
-                      className="absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      className="absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/40 to-transparent"
                     />
                   </motion.span>
                 ))}
@@ -132,7 +136,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                    key="check"
                    initial={{ scale: 0, rotate: -45 }}
                    animate={{ scale: 1, rotate: 0 }}
-                   className="text-emerald-500"
+                   className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]"
                  >
                    <Check size={14} strokeWidth={3} />
                  </motion.div>
@@ -154,13 +158,15 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                   backgroundColor: isComplete ? "#10b981" : "#3b82f6" 
                 }}
                 transition={{ ease: "easeInOut", backgroundColor: { duration: 0.6 } }}
-                className="absolute inset-0 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-                style={{ boxShadow: isComplete ? "0 0 15px rgba(16,185,129,0.5)" : "" }}
+                className="absolute inset-0"
+                style={{ 
+                  boxShadow: isComplete ? "0 0 20px rgba(16,185,129,0.8)" : "" 
+                }}
               />
             </div>
             
             <div className="flex justify-between w-32 md:w-44 px-1">
-              <span className={`text-[6px] md:text-[7px] font-mono tracking-tighter uppercase transition-colors duration-700 ${isComplete ? "text-emerald-600/70" : "text-zinc-700"}`}>
+              <span className={`text-[6px] md:text-[7px] font-mono tracking-tighter uppercase transition-colors duration-700 ${isComplete ? "text-emerald-500" : "text-zinc-700"}`}>
                 {isComplete ? "SYSTEM_READY" : `LOAD_0${progress}%`}
               </span>
               <span className="text-[6px] md:text-[7px] font-mono text-zinc-800 tracking-tighter">V.2.0.26</span>
@@ -169,11 +175,19 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
         </motion.div>
       </div>
 
+      {/* GREEN BORDER - KEPT AND TRANSITION INTENSIFIED */}
       <motion.div 
         initial={{ opacity: 0, scale: 1.02 }}
-        animate={{ opacity: 1, scale: 1 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+          borderColor: isComplete ? "rgba(52, 211, 153, 0.4)" : "rgba(255, 255, 255, 0.03)"
+        }}
         transition={{ delay: 0.3, duration: 1.2 }}
-        className={`absolute inset-6 md:inset-12 pointer-events-none border rounded-[1.5rem] md:rounded-[2.5rem] transition-colors duration-1000 ${isComplete ? "border-emerald-500/20" : "border-white/[0.03]"}`}
+        className="absolute inset-6 md:inset-12 pointer-events-none border rounded-[1.5rem] md:rounded-[2.5rem] transition-colors duration-1000"
+        style={{
+          boxShadow: isComplete ? "inset 0 0 40px rgba(52, 211, 153, 0.08)" : "none"
+        }}
       />
     </motion.div>
   );
