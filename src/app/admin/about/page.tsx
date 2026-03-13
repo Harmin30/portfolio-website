@@ -37,7 +37,9 @@ export default function AdminAbout() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showUploadMode, setShowUploadMode] = useState(false);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [aboutText, setAboutText] = useState("");
   const [profilePhoto, setProfilePhoto] = useState("");
   const [resumeLink, setResumeLink] = useState("");
@@ -57,6 +59,7 @@ export default function AdminAbout() {
       setAboutText(data.about_text || "");
       setProfilePhoto(data.profile_photo || "");
       setProfilePhotoPreview(data.profile_photo || "");
+      setProfilePhotoUrl(data.profile_photo || "");
       setResumeLink(data.resume_link || "");
 
       if (Array.isArray(data.education) && data.education.length > 0) {
@@ -112,6 +115,7 @@ export default function AdminAbout() {
         throw new Error(result.details || result.error || "Upload failed");
       setProfilePhoto(result.url);
       setProfilePhotoPreview(result.url);
+      setProfilePhotoUrl(result.url);
       notification.success("Image uploaded!");
     } catch (error) {
       notification.error(
@@ -181,69 +185,125 @@ export default function AdminAbout() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Profile Photo & Resume Link Row */}
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className={sectionClass}>
-            <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
+        {/* Profile Photo & Resume Link Row - Using 5 column grid for better balance */}
+        <div className="grid md:grid-cols-5 gap-8">
+          <div className={`${sectionClass} md:col-span-2 flex flex-col`}>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
               <ImageIcon size={18} className="text-indigo-500" />
               <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
                 Profile Identity
               </h2>
             </div>
-            <div className="p-8 flex flex-col items-center sm:items-start">
-              {profilePhotoPreview ? (
-                <div className="relative group">
-                  <img
-                    src={profilePhotoPreview}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded-[2rem] border-2 border-slate-100 dark:border-white/10 shadow-xl"
-                  />
+            <div className="p-6 space-y-6 flex flex-col items-center flex-grow justify-center">
+              {/* Compact Switcher */}
+              <div className="flex p-1 bg-slate-100 dark:bg-white/5 rounded-xl w-full max-w-[200px]">
+                <button
+                  type="button"
+                  onClick={() => setShowUploadMode(false)}
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                    !showUploadMode
+                      ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm"
+                      : "text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowUploadMode(true)}
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                    showUploadMode
+                      ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm"
+                      : "text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  UPLOAD
+                </button>
+              </div>
+
+              {/* Compact Preview Container */}
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-[2rem] overflow-hidden border-2 border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-slate-900 flex items-center justify-center shadow-inner">
+                  {profilePhotoPreview ? (
+                    <img
+                      src={profilePhotoPreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <UserCircle size={48} className="text-slate-200 dark:text-slate-800" />
+                  )}
+                  
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center">
+                      <Loader size={24} className="animate-spin text-indigo-600" />
+                    </div>
+                  )}
+                </div>
+                
+                {profilePhotoPreview && (
                   <button
                     type="button"
                     onClick={() => {
                       setProfilePhoto("");
                       setProfilePhotoPreview("");
+                      setProfilePhotoUrl("");
                     }}
-                    className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 shadow-lg transition-all scale-100 active:scale-90"
+                    className="absolute -top-2 -right-2 p-1.5 bg-white dark:bg-slate-800 text-red-500 rounded-full shadow-lg border border-slate-100 dark:border-white/10 hover:scale-110 transition-transform"
                   >
-                    <X size={16} />
+                    <X size={14} />
                   </button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[2rem] cursor-pointer hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 transition-all group">
-                  <Upload
-                    size={24}
-                    className="text-slate-400 group-hover:text-indigo-500 transition-colors"
-                  />
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-2">
-                    Upload
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={isUploading}
-                    className="hidden"
-                  />
-                </label>
-              )}
-              {isUploading && (
-                <div className="flex items-center gap-2 text-[10px] font-black text-indigo-500 mt-4 uppercase tracking-[0.2em]">
-                  <Loader size={14} className="animate-spin" />
-                  <span>Uploading</span>
-                </div>
-              )}
+                )}
+              </div>
+
+              <div className="w-full space-y-4">
+                {!showUploadMode ? (
+                  <div className="space-y-2">
+                    <label className={labelClass}>Image URL</label>
+                    <input
+                      type="url"
+                      value={profilePhotoUrl}
+                      onChange={(e) => {
+                        const url = e.target.value;
+                        setProfilePhotoUrl(url);
+                        if (url) {
+                          setProfilePhoto(url);
+                          setProfilePhotoPreview(url);
+                        }
+                      }}
+                      placeholder="https://..."
+                      className={`${inputClass} !py-2.5`}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all group">
+                      <Upload size={16} className="text-slate-400 group-hover:text-indigo-500" />
+                      <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">
+                        Select Image
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className={sectionClass}>
+          <div className={`${sectionClass} md:col-span-3`}>
             <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
               <Link2 size={18} className="text-indigo-500" />
               <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
                 Credentials
               </h2>
             </div>
-            <div className="p-8 space-y-4">
+            <div className="p-8 space-y-6 flex flex-col justify-center h-[calc(100%-68px)]">
               <div className="space-y-1">
                 <label className={labelClass}>Resume / CV URL</label>
                 <input
@@ -254,9 +314,11 @@ export default function AdminAbout() {
                   className={inputClass}
                 />
               </div>
-              <p className="text-[10px] text-slate-400 font-bold leading-relaxed uppercase tracking-tight">
-                Provide a direct link to your PDF resume.
-              </p>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                <p className="text-[11px] text-slate-400 font-bold leading-relaxed uppercase tracking-tight">
+                  Provide a direct link to your professional PDF resume or portfolio stored in the cloud.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -472,7 +534,7 @@ export default function AdminAbout() {
             ) : (
               <Save size={18} />
             )}
-            <span>{isSaving ? "Saving Progress..." : "Commit Changes"}</span>
+            <span>{isSaving ? "Saving Progress..." : "Save About"}</span>
           </button>
         </div>
       </form>

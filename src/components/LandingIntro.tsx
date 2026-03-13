@@ -2,21 +2,39 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check } from "lucide-react"; // Added for a clear success visual
+import { Check } from "lucide-react";
 
 export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
   const [progress, setProgress] = useState(0);
+  const [displayName, setDisplayName] = useState("");
+  const [isNameLoaded, setIsNameLoaded] = useState(false);
 
   useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+          const data = await response.json();
+          setDisplayName(data.name ? data.name.toUpperCase() : "HARMIN PATEL");
+        } else {
+          setDisplayName("HARMIN PATEL");
+        }
+      } catch (error) {
+        setDisplayName("HARMIN PATEL");
+      } finally {
+        setIsNameLoaded(true);
+      }
+    };
+    fetchName();
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev < 100) return prev + 1;
         clearInterval(interval);
         return 100;
       });
-    }, 20); // Smooth fill over ~2 seconds
+    }, 20);
 
-    // Extended the total duration to 3.5s to allow for a readable "Secured" state
     const timer = setTimeout(() => {
       onFinish();
     }, 3500);
@@ -27,10 +45,8 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
     };
   }, [onFinish]);
 
-  const name = "HARMIN PATEL".split("");
+  const nameArray = displayName.split("");
   const isComplete = progress === 100;
-  
-  // Pulse speeds up until 100%, then stays calm/steady for the hold
   const pulseDuration = isComplete ? 2 : 5 - (progress / 100) * 4.2; 
 
   return (
@@ -41,71 +57,66 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
         scaleX: 1.4,
         opacity: 0,
         filter: "brightness(4) blur(2px)",
-        transition: { 
-          duration: 0.5, // Slightly slower exit for better readability
-          ease: [0.19, 1, 0.22, 1]
-        } 
+        transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] } 
       }}
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#050505] text-white overflow-hidden selection:bg-none"
     >
-      {/* Scanline Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(255,255,255,0.25)_50%)] bg-[length:100%_3px] md:bg-[length:100%_4px]" />
 
-      {/* Dynamic Pulse Glow */}
       <motion.div
         animate={{
           scale: isComplete ? [1, 1.1, 1] : [1, 1.15, 1],
           opacity: isComplete ? 0.25 : [0.08, 0.2, 0.08],
         }}
-        transition={{ 
-          duration: pulseDuration, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
+        transition={{ duration: pulseDuration, repeat: Infinity, ease: "easeInOut" }}
         className={`absolute w-[280px] h-[280px] md:w-[600px] md:h-[600px] blur-[80px] md:blur-[140px] rounded-full transition-colors duration-1000 ${isComplete ? "bg-emerald-500/20" : "bg-blue-600/15"}`}
       />
 
       <div className="relative flex flex-col items-center z-10 px-4 w-full">
-        <div className="overflow-hidden py-4">
-          <motion.h1
-            initial="hidden"
-            animate="visible"
-            className="text-2xl sm:text-4xl md:text-5xl font-black tracking-[0.2em] md:tracking-[0.4em] flex justify-center relative"
-          >
-            {name.map((char, i) => (
-              <motion.span
-                key={i}
-                variants={{
-                  hidden: { y: "115%", opacity: 0, skewX: 15, filter: "blur(5px)" },
-                  visible: { 
-                    y: 0, 
-                    opacity: 1, 
-                    skewX: 0,
-                    filter: "blur(0px)",
-                    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: i * 0.03 } 
-                  },
-                }}
-                animate={{ x: [0, -0.5, 0.5, 0] }}
-                transition={{ duration: 0.15, delay: 0.5 + (i * 0.02) }}
-                className="inline-block relative"
+        <div className="overflow-hidden py-4 min-h-[60px] md:min-h-[80px] flex items-center">
+          <AnimatePresence>
+            {isNameLoaded && (
+              <motion.h1
+                initial="hidden"
+                animate="visible"
+                className="text-2xl sm:text-4xl md:text-5xl font-black tracking-[0.2em] md:tracking-[0.4em] flex justify-center relative"
               >
-                {char === " " ? "\u00A0" : char}
-                <motion.span 
-                  animate={{
-                    opacity: isComplete ? [0, 0.3, 0] : [0, 0.4, 0],
-                    left: ["-100%", "200%"]
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: isComplete ? 1 : Infinity,
-                    delay: 1 + (i * 0.1),
-                    repeatDelay: 4
-                  }}
-                  className={`absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent`}
-                />
-              </motion.span>
-            ))}
-          </motion.h1>
+                {nameArray.map((char, i) => (
+                  <motion.span
+                    key={`${displayName}-${i}`} // Dynamic key ensures re-animation if name changes
+                    variants={{
+                      hidden: { y: "115%", opacity: 0, skewX: 15, filter: "blur(5px)" },
+                      visible: { 
+                        y: 0, 
+                        opacity: 1, 
+                        skewX: 0,
+                        filter: "blur(0px)",
+                        transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: i * 0.03 } 
+                      },
+                    }}
+                    animate={{ x: [0, -0.5, 0.5, 0] }}
+                    transition={{ duration: 0.15, delay: 0.5 + (i * 0.02) }}
+                    className="inline-block relative"
+                  >
+                    {char === " " ? "\u00A0" : char}
+                    <motion.span 
+                      animate={{
+                        opacity: isComplete ? [0, 0.3, 0] : [0, 0.4, 0],
+                        left: ["-100%", "200%"]
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: isComplete ? 1 : Infinity,
+                        delay: 1 + (i * 0.1),
+                        repeatDelay: 4
+                      }}
+                      className="absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    />
+                  </motion.span>
+                ))}
+              </motion.h1>
+            )}
+          </AnimatePresence>
         </div>
 
         <motion.div

@@ -12,8 +12,11 @@ import {
   Github,
   Linkedin,
   Code2,
+  Image as ImageIcon,
+  UserCircle,
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default function AdminProfile() {
   const notification = useNotification();
@@ -28,6 +31,7 @@ export default function AdminProfile() {
     linkedin: "",
     leetcode: "",
     email: "",
+    hero_image: "",
   });
 
   useEffect(() => {
@@ -48,6 +52,7 @@ export default function AdminProfile() {
         linkedin: data.linkedin || "",
         leetcode: data.leetcode || "",
         email: data.email || "",
+        hero_image: data.hero_image || "",
       });
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -132,87 +137,113 @@ export default function AdminProfile() {
         </div>
       </div>
 
-      {/* Info Banner */}
-      <div className="flex items-center gap-4 p-5 rounded-[1.5rem] bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10 mx-1">
-        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-sm shrink-0 border border-indigo-100 dark:border-indigo-500/20">
-          <Info size={20} className="text-indigo-600 dark:text-indigo-400" />
-        </div>
-        <p className="text-xs font-bold leading-relaxed text-indigo-900 dark:text-indigo-300/80 uppercase tracking-tight">
-          Visual Identity (Photo) is synced from the{" "}
-          <span className="text-indigo-600 dark:text-indigo-400 underline decoration-2">
-            About
-          </span>{" "}
-          module.
-        </p>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Core Profile Details */}
-        <div className={sectionClass}>
-          <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
-            <User size={18} className="text-indigo-500" />
-            <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
-              Public Profile
-            </h2>
+        {/* Top Section: Hero Image & Info Row - 5 Column Grid */}
+        <div className="grid md:grid-cols-5 gap-8">
+          {/* Hero Image Card (2/5) */}
+          <div className={`${sectionClass} md:col-span-2 flex flex-col`}>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
+              <ImageIcon size={18} className="text-indigo-500" />
+              <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
+                Hero Image
+              </h2>
+            </div>
+
+            <div className="p-6 flex flex-col items-center flex-grow justify-center">
+              <div className="w-full">
+                <ImageUploader
+                  value={formData.hero_image}
+                  onChange={(url) =>
+                    setFormData({ ...formData, hero_image: url })
+                  }
+                  label="Display Photo"
+                  placeholder="https://..."
+                  folder="hero-images"
+                  labelClass={labelClass}
+                  inputClass={inputClass}
+                  previewClass="w-32 h-32 rounded-[2rem] mx-auto mb-6 border-2 border-slate-100 dark:border-white/10 shadow-inner"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 font-bold leading-relaxed uppercase tracking-tight mt-4 text-center max-w-[180px]">
+                Appears on the homepage hero section.
+              </p>
+            </div>
           </div>
 
-          <div className="p-8 space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-1">
-                <label className={labelClass}>Full Display Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="John Doe"
-                  className={inputClass}
-                />
-              </div>
-              <div className="space-y-1">
-                <label className={labelClass}>Job Title / Headline</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  placeholder="Full Stack Developer"
-                  className={inputClass}
-                />
-              </div>
+          {/* Core Info Card (3/5) */}
+          <div className={`${sectionClass} md:col-span-3`}>
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
+              <User size={18} className="text-indigo-500" />
+              <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
+                Core Details
+              </h2>
             </div>
 
-            <div className="space-y-1">
-              <label className={labelClass}>Headline Biography</label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                rows={4}
-                placeholder="A high-level summary of your professional expertise..."
-                className={`${inputClass} resize-none leading-relaxed font-medium`}
-              />
-            </div>
-
-            <div className="space-y-1 md:w-1/2">
-              <label className={labelClass}>Primary Contact Email</label>
-              <div className="relative group">
-                <Mail
-                  size={16}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-500"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="hello@domain.com"
-                  className={`${inputClass} pl-12`}
-                />
+            <div className="p-8 space-y-6 flex flex-col justify-center h-[calc(100%-60px)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClass}>Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="John Doe"
+                    className={inputClass}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className={labelClass}>Job Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    placeholder="Full Stack Developer"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className={labelClass}>Primary Email</label>
+                <div className="relative group">
+                  <Mail
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="hello@domain.com"
+                    className={`${inputClass} pl-12`}
+                  />
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Biography Section */}
+        <div className={sectionClass}>
+          <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-2">
+            <Info size={18} className="text-indigo-500" />
+            <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
+              Headline Biography
+            </h2>
+          </div>
+          <div className="p-8">
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              rows={4}
+              placeholder="A high-level summary of your professional expertise..."
+              className={`${inputClass} resize-none leading-relaxed font-medium`}
+            />
           </div>
         </div>
 
@@ -292,7 +323,7 @@ export default function AdminProfile() {
             ) : (
               <>
                 <Save size={18} />
-                <span>Apply Identity Changes</span>
+                <span>Save Profile</span>
               </>
             )}
           </button>

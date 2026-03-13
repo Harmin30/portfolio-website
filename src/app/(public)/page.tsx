@@ -267,7 +267,7 @@ export default function Home() {
                 className="w-full lg:col-span-5 order-1 lg:order-2 flex justify-center lg:justify-end"
               >
                 <div className="relative group">
-                  <div className="relative w-44 h-44 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full p-2 border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-sm shadow-2xl overflow-hidden">
+                  <div className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full p-2 border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-sm shadow-2xl overflow-hidden">
                     {/* Placeholder Loader: Shown only while image is downloading */}
                     {!imageLoaded && (
                       <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
@@ -288,7 +288,11 @@ export default function Home() {
                       transition={{ duration: 0.8, ease: "easeOut" }}
                     >
                       <Image
-                        src={about?.profile_photo || "/profile.JPG"}
+                        src={
+                          profile.hero_image ||
+                          about?.profile_photo ||
+                          "/profile.JPG"
+                        }
                         fill
                         alt={profile.name}
                         className="object-cover"

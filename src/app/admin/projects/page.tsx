@@ -487,7 +487,7 @@ export default function AdminProjects() {
                       ? "Saving..."
                       : editingId
                         ? "Update Project"
-                        : "Save Entry"}
+                        : "Save Project"}
                   </span>
                 </button>
               </div>
