@@ -67,13 +67,24 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
       <motion.div
         animate={{
           scale: isComplete ? [1, 1.25, 1] : [1, 1.15, 1],
-          opacity: isComplete ? 0.45 : [0.08, 0.2, 0.08],
+          opacity: isComplete ? 0.45 : [0.08, 0.2, 0.08], // Boosted success opacity from 0.25 to 0.45
         }}
         transition={{ duration: pulseDuration, repeat: Infinity, ease: "easeInOut" }}
         className={`absolute w-[320px] h-[320px] md:w-[700px] md:h-[700px] blur-[100px] md:blur-[160px] rounded-full transition-all duration-1000 ${
           isComplete ? "bg-emerald-400/30" : "bg-blue-600/15"
         }`}
       />
+
+      {/* SECONDARY SUCCESS LAYER - Adds depth when complete */}
+      <AnimatePresence>
+        {isComplete && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute inset-0 bg-emerald-500/[0.03] pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
 
       <div className="relative flex flex-col items-center z-10 px-4 w-full">
         <div className="overflow-hidden py-4 min-h-[60px] md:min-h-[80px] flex items-center">
@@ -160,7 +171,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                 transition={{ ease: "easeInOut", backgroundColor: { duration: 0.6 } }}
                 className="absolute inset-0"
                 style={{ 
-                  boxShadow: isComplete ? "0 0 20px rgba(16,185,129,0.8)" : "" 
+                  boxShadow: isComplete ? "0 0 20px rgba(16,185,129,0.8)" : "" // Intensified bar glow
                 }}
               />
             </div>
@@ -175,18 +186,18 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
         </motion.div>
       </div>
 
-      {/* GREEN BORDER - KEPT AND TRANSITION INTENSIFIED */}
+      {/* SUCCESS BORDER EFFECT */}
       <motion.div 
         initial={{ opacity: 0, scale: 1.02 }}
         animate={{ 
           opacity: 1, 
           scale: 1,
-          borderColor: isComplete ? "rgba(52, 211, 153, 0.4)" : "rgba(255, 255, 255, 0.03)"
+          borderColor: isComplete ? "rgba(52, 211, 153, 0.3)" : "rgba(255, 255, 255, 0.03)"
         }}
         transition={{ delay: 0.3, duration: 1.2 }}
         className="absolute inset-6 md:inset-12 pointer-events-none border rounded-[1.5rem] md:rounded-[2.5rem] transition-colors duration-1000"
         style={{
-          boxShadow: isComplete ? "inset 0 0 40px rgba(52, 211, 153, 0.08)" : "none"
+          boxShadow: isComplete ? "inset 0 0 30px rgba(52, 211, 153, 0.05)" : "none"
         }}
       />
     </motion.div>
