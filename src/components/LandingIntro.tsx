@@ -8,7 +8,9 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
   const [progress, setProgress] = useState(0);
   const [displayName, setDisplayName] = useState("");
   const [isNameLoaded, setIsNameLoaded] = useState(false);
+  const [canShowSuccess, setCanShowSuccess] = useState(false);
 
+  // 1. Fetch Name First
   useEffect(() => {
     const fetchName = async () => {
       try {
@@ -22,10 +24,15 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
       } catch (error) {
         setDisplayName("HARMIN PATEL");
       } finally {
-        setIsNameLoaded(true);
+        setIsNameLoaded(true); // This acts as the "Start" trigger
       }
     };
     fetchName();
+  }, []);
+
+  // 2. Start Progress ONLY after name is loaded
+  useEffect(() => {
+    if (!isNameLoaded) return; // Wait here until API responds
 
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -35,18 +42,26 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
       });
     }, 20);
 
-    const timer = setTimeout(() => {
-      onFinish();
-    }, 3500);
+    return () => clearInterval(interval);
+  }, [isNameLoaded]);
 
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [onFinish]);
+  // 3. Sequential Success Logic
+  useEffect(() => {
+    if (progress === 100 && isNameLoaded) {
+      // Small buffer to let the last letter finish its motion
+      const timer = setTimeout(() => {
+        setCanShowSuccess(true);
+        
+        // Final exit
+        setTimeout(onFinish, 1500);
+      }, 500); 
+
+      return () => clearTimeout(timer);
+    }
+  }, [progress, isNameLoaded, onFinish]);
 
   const nameArray = displayName.split("");
-  const isComplete = progress === 100;
+  const isComplete = canShowSuccess; 
   const pulseDuration = isComplete ? 2 : 5 - (progress / 100) * 4.2;
 
   return (
@@ -63,14 +78,12 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
     >
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(255,255,255,0.25)_50%)] bg-[length:100%_3px] md:bg-[length:100%_4px]" />
 
-      {/* REFINED BOX CONTAINER */}
       <motion.div
         initial={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
         animate={{
           opacity: 1,
           scale: 1,
           filter: "blur(0px)",
-          // Increased initial white border opacity slightly to 0.12
           borderColor: isComplete
             ? "rgba(52, 211, 153, 0.4)"
             : "rgba(255, 255, 255, 0.12)",
@@ -83,7 +96,6 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
             : "inset 0 0 20px rgba(255, 255, 255, 0.02)",
         }}
       >
-        {/* PULSING GLOW - Strictly inside */}
         <motion.div
           animate={{
             scale: isComplete ? [1, 1.25, 1] : [1, 1.15, 1],
@@ -101,6 +113,10 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
 
         <div className="relative flex flex-col items-center z-10 px-4 w-full text-center">
           <div className="overflow-hidden py-4 min-h-[60px] md:min-h-[80px] flex items-center justify-center">
+            {/* We only show the h1 once the name is loaded. 
+              Because the bar only starts AFTER this, the name 
+              will always be ready to animate.
+            */}
             <AnimatePresence>
               {isNameLoaded && (
                 <motion.h1
@@ -130,8 +146,6 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                           },
                         },
                       }}
-                      animate={{ x: [0, -0.5, 0.5, 0] }}
-                      transition={{ duration: 0.15, delay: 0.5 + i * 0.02 }}
                       className="inline-block relative"
                     >
                       {char === " " ? "\u00A0" : char}
@@ -158,7 +172,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 1 }}
+            transition={{ delay: 0.2, duration: 1 }} // Reduced delay so it appears with the name
             className="flex flex-col items-center gap-4 mt-2"
           >
             <div className="flex items-center gap-2">
@@ -192,7 +206,8 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                     backgroundColor: isComplete ? "#10b981" : "#3b82f6",
                   }}
                   transition={{
-                    ease: "easeInOut",
+                    ease: "linear", // Linear is smoother for a pure loading bar
+                    duration: 0.02,
                     backgroundColor: { duration: 0.6 },
                   }}
                   className="absolute inset-0"
