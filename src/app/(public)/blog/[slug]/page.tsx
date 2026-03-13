@@ -95,7 +95,7 @@ export default function BlogArticle() {
 
       <main className="relative pb-24">
         {/* Hero Section */}
-        <header className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden bg-zinc-900">
+        <header className="relative w-full h-[45vh] md:h-[60vh] lg:h-[70vh] overflow-hidden bg-zinc-900">
           {!heroImageLoaded && post.image && (
             <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 via-zinc-700 to-zinc-800 animate-pulse" />
           )}
@@ -112,14 +112,14 @@ export default function BlogArticle() {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#fafafa] dark:from-[#050505] via-transparent to-transparent" />
 
-          <div className="absolute inset-0 flex flex-col justify-end max-w-4xl mx-auto px-6 pb-12">
+          <div className="absolute inset-0 flex flex-col justify-end max-w-4xl mx-auto px-6 pb-6 md:pb-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="space-y-6"
+              className="space-y-4 md:space-y-6"
             >
-              <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm font-mono uppercase tracking-widest text-amber-500 dark:text-amber-400 font-bold">
+              <div className="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-sm font-mono uppercase tracking-widest text-amber-500 dark:text-amber-400 font-bold">
                 <span className="flex items-center gap-1.5">
                   <Calendar size={14} />{" "}
                   {formatDate(post.published_at || post.created_at)}
@@ -129,7 +129,7 @@ export default function BlogArticle() {
                   <Clock size={14} /> {estimateReadTime(post.content || "")}
                 </span>
               </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[0.9] text-zinc-900 dark:text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[0.9] text-zinc-900 dark:text-white">
                 {post.title}
               </h1>
             </motion.div>
@@ -137,14 +137,14 @@ export default function BlogArticle() {
         </header>
 
         {/* Navigation Back Button */}
-        <div className="max-w-3xl mx-auto px-6 mt-8 md:mt-12 mb-12">
+        <div className="max-w-3xl mx-auto px-6 mt-6 md:mt-12 mb-8 md:mb-12">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2.5 px-5 py-3 text-sm font-bold text-zinc-700 dark:text-zinc-300 bg-gradient-to-r from-white/60 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/40 hover:from-white hover:to-white/80 dark:hover:from-zinc-900/80 dark:hover:to-zinc-900/60 border border-zinc-300/50 dark:border-zinc-700/50 hover:border-amber-400/50 dark:hover:border-amber-500/40 rounded-xl shadow-sm hover:shadow-md dark:shadow-lg dark:hover:shadow-amber-500/10 transition-all duration-300 group"
+            className="inline-flex items-center gap-2.5 px-4 md:px-5 py-2.5 md:py-3 text-xs md:text-sm font-bold text-zinc-700 dark:text-zinc-300 bg-gradient-to-r from-white/60 to-white/40 dark:from-zinc-900/60 dark:to-zinc-900/40 hover:from-white hover:to-white/80 dark:hover:from-zinc-900/80 dark:hover:to-zinc-900/60 border border-zinc-300/50 dark:border-zinc-700/50 hover:border-amber-400/50 dark:hover:border-amber-500/40 rounded-xl shadow-sm hover:shadow-md dark:shadow-lg dark:hover:shadow-amber-500/10 transition-all duration-300 group"
           >
             <ArrowLeft
-              size={18}
-              className="text-amber-600 dark:text-amber-400 group-hover:-translate-x-1 transition-transform duration-300"
+              size={16}
+              className="md:size-[18px] text-amber-600 dark:text-amber-400 group-hover:-translate-x-1 transition-transform duration-300"
             />
             <span>Back to Blog</span>
           </Link>
@@ -154,81 +154,81 @@ export default function BlogArticle() {
         <div className="max-w-3xl mx-auto px-6">
           {/* Summary/Excerpt Box */}
           {post.excerpt && (
-            <div className="mb-12 p-8 rounded-2xl bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/40 dark:to-zinc-900/60 border-2 border-amber-200 dark:border-amber-900/30 shadow-lg shadow-amber-500/10 dark:shadow-lg dark:shadow-black/20 italic text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-              <span className="text-3xl text-amber-600 dark:text-amber-400 mr-2 select-none">
+            <div className="mb-8 md:mb-12 p-5 md:p-8 rounded-2xl bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/40 dark:to-zinc-900/60 border-2 border-amber-200 dark:border-amber-900/30 shadow-lg shadow-amber-500/10 dark:shadow-lg dark:shadow-black/20 italic text-base md:text-lg lg:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+              <span className="text-2xl md:text-3xl text-amber-600 dark:text-amber-400 mr-2 select-none">
                 &ldquo;
               </span>
               {post.excerpt}
-              <span className="text-3xl text-amber-600 dark:text-amber-400 ml-2 select-none">
+              <span className="text-2xl md:text-3xl text-amber-600 dark:text-amber-400 ml-2 select-none">
                 &rdquo;
               </span>
             </div>
           )}
 
           {/* Content Area */}
-          <article className="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none">
-            <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-3xl border border-zinc-200 dark:border-zinc-800/50 p-8 md:p-12 shadow-lg shadow-zinc-900/5 dark:shadow-lg dark:shadow-black/20">
-              <div className="space-y-6">
+          <article className="prose max-w-none text-sm md:text-base">
+            <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-3xl border border-zinc-200 dark:border-zinc-800/50 p-6 md:p-12 shadow-lg shadow-zinc-900/5 dark:shadow-lg dark:shadow-black/20">
+              <div className="space-y-4 md:space-y-6">
                 <ReactMarkdown
                   remarkPlugins={[remarkBreaks, remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
                   components={{
                     h1: ({ children }) => (
-                      <h1 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight text-zinc-900 dark:text-white pt-2 pb-4 border-b-2 border-amber-500/30 dark:border-amber-500/20 mt-0 mb-0">
+                      <h1 className="text-xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-tight text-zinc-900 dark:text-white pt-2 pb-3 md:pb-4 border-b-2 border-amber-500/30 dark:border-amber-500/20 mt-0 mb-0">
                         {children}
                       </h1>
                     ),
                     h2: ({ children }) => (
-                      <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mt-8 mb-4 pt-2 pb-2 border-l-4 border-amber-500 pl-4">
+                      <h2 className="text-lg md:text-2xl lg:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mt-6 md:mt-8 mb-3 md:mb-4 pt-2 pb-2 border-l-4 border-amber-500 pl-4">
                         {children}
                       </h2>
                     ),
                     h3: ({ children }) => (
-                      <h3 className="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mt-6 mb-3">
+                      <h3 className="text-base md:text-xl lg:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mt-5 md:mt-6 mb-2 md:mb-3">
                         {children}
                       </h3>
                     ),
                     h4: ({ children }) => (
-                      <h4 className="text-lg font-bold text-zinc-700 dark:text-zinc-200 mt-4 mb-2">
+                      <h4 className="text-sm md:text-lg font-bold text-zinc-700 dark:text-zinc-200 mt-3 md:mt-4 mb-2">
                         {children}
                       </h4>
                     ),
                     p: ({ children }) => (
-                      <p className="text-zinc-700 dark:text-zinc-300 mb-4 leading-8 text-justify">
+                      <p className="text-zinc-700 dark:text-zinc-300 mb-3 md:mb-4 leading-7 md:leading-8 text-justify">
                         {children}
                       </p>
                     ),
                     ul: ({ children }) => (
-                      <ul className="list-none mb-6 space-y-3 ml-4">
+                      <ul className="list-none mb-4 md:mb-6 space-y-2 md:space-y-3 ml-4">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="list-none mb-6 space-y-3 ml-4 counter-reset: list-counter">
+                      <ol className="list-none mb-4 md:mb-6 space-y-2 md:space-y-3 ml-4 counter-reset: list-counter">
                         {children}
                       </ol>
                     ),
                     li: ({ children }) => (
-                      <li className="text-zinc-700 dark:text-zinc-300 flex items-start gap-3 leading-7">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 dark:bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-400 mt-0.5">
+                      <li className="text-zinc-700 dark:text-zinc-300 flex items-start gap-2 md:gap-3 leading-6 md:leading-7 text-sm md:text-base">
+                        <span className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-amber-500/20 dark:bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-400 mt-0.5">
                           •
                         </span>
                         <span>{children}</span>
                       </li>
                     ),
                     blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-amber-500 pl-6 my-6 py-4 px-6 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-lg italic text-zinc-600 dark:text-zinc-400 text-base">
+                      <blockquote className="border-l-4 border-amber-500 pl-4 md:pl-6 my-4 md:my-6 py-3 md:py-4 px-4 md:px-6 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-lg italic text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
                         {children}
                       </blockquote>
                     ),
                     code: ({ children }) => (
-                      <code className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded font-mono text-sm font-semibold">
+                      <code className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded font-mono text-xs md:text-sm font-semibold break-words">
                         {children}
                       </code>
                     ),
                     pre: ({ children }) => (
-                      <pre className="bg-zinc-900 dark:bg-zinc-950 text-zinc-100 p-6 rounded-2xl overflow-x-auto mb-6 border border-zinc-800 dark:border-zinc-700 shadow-lg">
-                        <code className="font-mono text-sm leading-relaxed">
+                      <pre className="bg-zinc-900 dark:bg-zinc-950 text-zinc-100 p-4 md:p-6 rounded-2xl overflow-x-auto mb-4 md:mb-6 border border-zinc-800 dark:border-zinc-700 shadow-lg text-xs md:text-sm">
+                        <code className="font-mono leading-relaxed">
                           {children}
                         </code>
                       </pre>
@@ -238,12 +238,12 @@ export default function BlogArticle() {
                       <img
                         src={src}
                         alt={alt || "Article image"}
-                        className="rounded-2xl shadow-lg shadow-zinc-900/20 dark:shadow-black/40 my-8 w-full border border-zinc-200 dark:border-zinc-800"
+                        className="rounded-2xl shadow-lg shadow-zinc-900/20 dark:shadow-black/40 my-6 md:my-8 w-full border border-zinc-200 dark:border-zinc-800"
                       />
                     ),
                     table: ({ children }) => (
-                      <div className="overflow-x-auto my-6">
-                        <table className="w-full border-collapse">
+                      <div className="overflow-x-auto my-4 md:my-6">
+                        <table className="w-full border-collapse text-sm md:text-base">
                           {children}
                         </table>
                       </div>
@@ -264,19 +264,19 @@ export default function BlogArticle() {
                       </tr>
                     ),
                     th: ({ children }) => (
-                      <th className="px-4 py-2 text-left font-bold text-zinc-900 dark:text-white border-b-2 border-zinc-300 dark:border-zinc-700">
+                      <th className="px-2 md:px-4 py-2 text-left text-xs md:text-sm font-bold text-zinc-900 dark:text-white border-b-2 border-zinc-300 dark:border-zinc-700">
                         {children}
                       </th>
                     ),
                     td: ({ children }) => (
-                      <td className="px-4 py-2 text-zinc-700 dark:text-zinc-300">
+                      <td className="px-2 md:px-4 py-2 text-xs md:text-sm text-zinc-700 dark:text-zinc-300">
                         {children}
                       </td>
                     ),
                     a: ({ href, children }) => (
                       <a
                         href={href}
-                        className="text-amber-600 dark:text-amber-400 font-semibold hover:underline transition-colors"
+                        className="text-amber-600 dark:text-amber-400 font-semibold hover:underline transition-colors break-all"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -284,7 +284,7 @@ export default function BlogArticle() {
                       </a>
                     ),
                     hr: () => (
-                      <hr className="my-8 border-t-2 border-zinc-200 dark:border-zinc-800" />
+                      <hr className="my-6 md:my-8 border-t-2 border-zinc-200 dark:border-zinc-800" />
                     ),
                   }}
                 >

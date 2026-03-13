@@ -66,10 +66,7 @@ export async function POST(request: NextRequest) {
         {
           title,
           issuer,
-          date_obtained:
-            date_obtained ||
-            date_from ||
-            new Date().toISOString().split("T")[0],
+          date_obtained: date_obtained || null,
           date_from: date_from || null,
           date_to: date_to || null,
           certificate_url,

@@ -24,6 +24,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { DeleteModalProvider } from "@/lib/deleteModal";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const adminLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -274,13 +275,16 @@ export default function AdminLayout({
               </div>
             </div>
 
-            <Link
-              href="/"
-              target="_blank"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-all"
-            >
-              Visit Site <ExternalLink size={12} />
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                target="_blank"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-indigo-500 transition-all"
+              >
+                Visit Site <ExternalLink size={12} />
+              </Link>
+              <ThemeSwitcher />
+            </div>
           </header>
 
           {/* Dynamic Main Body */}

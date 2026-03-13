@@ -85,20 +85,13 @@ export default function AdminCertificates() {
     }
 
     try {
-      // Determine the date_obtained value
-      // If date_obtained is provided, use it; otherwise use date_from from the range
-      const finalDateObtained =
-        formData.date_obtained ||
-        formData.date_from ||
-        new Date().toISOString().split("T")[0];
-
       if (editingId) {
         const { error } = await supabase
           .from("certificates")
           .update({
             title: formData.title,
             issuer: formData.issuer,
-            date_obtained: finalDateObtained,
+            date_obtained: formData.date_obtained || null,
             date_from: formData.date_from || null,
             date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
@@ -113,7 +106,7 @@ export default function AdminCertificates() {
           {
             title: formData.title,
             issuer: formData.issuer,
-            date_obtained: finalDateObtained,
+            date_obtained: formData.date_obtained || null,
             date_from: formData.date_from || null,
             date_to: formData.date_to || null,
             certificate_url: formData.certificate_url,
@@ -173,6 +166,27 @@ export default function AdminCertificates() {
       year: "numeric",
       month: "short",
     });
+  };
+
+  const calculateDuration = (startDate: string, endDate: string): string => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const months =
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
+
+    if (months === 0) return "< 1 month";
+    if (months === 1) return "1 month";
+    return `${months} months`;
+  };
+
+  const getDateDisplay = (cert: Certificate): string => {
+    if (cert.date_from && cert.date_to) {
+      const duration = calculateDuration(cert.date_from, cert.date_to);
+      return `${formatDate(cert.date_from)} – ${formatDate(cert.date_to)} (${duration})`;
+    }
+    return cert.date_obtained ? formatDate(cert.date_obtained) : "No date";
   };
 
   const inputClass =
@@ -259,13 +273,18 @@ export default function AdminCertificates() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-1">
-                  <label className={labelClass}>
-                    Date Obtained
-                    <span className="text-[9px] text-slate-400 ml-1">
-                      (or use duration below)
-                    </span>
+              {/* Date Section */}
+              <div className="space-y-3">
+                <div className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    📅 Choose ONE date option
+                  </p>
+                </div>
+
+                {/* Option 1: Single Date */}
+                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50">
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-3">
+                    Option 1: Single Date (Certificate Obtained)
                   </label>
                   <div className="relative">
                     <Calendar
@@ -281,79 +300,89 @@ export default function AdminCertificates() {
                           date_obtained: e.target.value,
                         })
                       }
-                      className={`${inputClass} pl-10`}
+                      placeholder="When you obtained the certificate"
+                      className={`${inputClass} pl-10 text-sm`}
                     />
                   </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                    Use this for certificates with a single completion date
+                  </p>
                 </div>
-                <div className="space-y-1">
-                  <label className={labelClass}>Certificate URL *</label>
-                  <input
-                    type="url"
-                    value={formData.certificate_url}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        certificate_url: e.target.value,
-                      })
-                    }
-                    required
-                    placeholder="https://..."
-                    className={inputClass}
-                  />
+
+                {/* Option 2: Date Range */}
+                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50">
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-3">
+                    Option 2: Course Duration (Start & End Dates)
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                        Start Date
+                      </p>
+                      <div className="relative">
+                        <Calendar
+                          size={14}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
+                        <input
+                          type="date"
+                          value={formData.date_from}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              date_from: e.target.value,
+                            })
+                          }
+                          placeholder="Course start"
+                          className={`${inputClass} pl-10 text-sm`}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                        End Date
+                      </p>
+                      <div className="relative">
+                        <Calendar
+                          size={14}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
+                        <input
+                          type="date"
+                          value={formData.date_to}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              date_to: e.target.value,
+                            })
+                          }
+                          placeholder="Course end"
+                          className={`${inputClass} pl-10 text-sm`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                    Use this for courses or training programs with a duration
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-1">
-                  <label className={labelClass}>
-                    Course Start Date
-                    <span className="text-[9px] text-slate-400 ml-1">
-                      (pair with end date)
-                    </span>
-                  </label>
-                  <div className="relative">
-                    <Calendar
-                      size={14}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-                    <input
-                      type="date"
-                      value={formData.date_from}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          date_from: e.target.value,
-                        })
-                      }
-                      className={`${inputClass} pl-10`}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <label className={labelClass}>
-                    Course End Date
-                    <span className="text-[9px] text-slate-400 ml-1">
-                      (pair with start date)
-                    </span>
-                  </label>
-                  <div className="relative">
-                    <Calendar
-                      size={14}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-                    <input
-                      type="date"
-                      value={formData.date_to}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          date_to: e.target.value,
-                        })
-                      }
-                      className={`${inputClass} pl-10`}
-                    />
-                  </div>
-                </div>
+              <div className="space-y-1">
+                <label className={labelClass}>Certificate URL *</label>
+                <input
+                  type="url"
+                  value={formData.certificate_url}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      certificate_url: e.target.value,
+                    })
+                  }
+                  required
+                  placeholder="https://..."
+                  className={inputClass}
+                />
               </div>
 
               <div className="space-y-1">
@@ -483,7 +512,7 @@ export default function AdminCertificates() {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    {formatDate(cert.date_obtained)}
+                    {getDateDisplay(cert)}
                   </span>
                   {cert.description && (
                     <>

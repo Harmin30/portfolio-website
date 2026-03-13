@@ -54,13 +54,29 @@ export default function Certificates() {
     });
   };
 
+  const calculateDuration = (startDate: string, endDate: string): string => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const months =
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
+
+    if (months === 0) return "< 1 month";
+    if (months === 1) return "1 month";
+    return `${months} months`;
+  };
+
   const getDateDisplay = (cert: Certificate): string => {
     // If both start and end dates are available, show the duration
     if (cert.date_from && cert.date_to) {
-      return `${formatDate(cert.date_from)} – ${formatDate(cert.date_to)}`;
+      const duration = calculateDuration(cert.date_from, cert.date_to);
+      return `${formatDate(cert.date_from)} – ${formatDate(cert.date_to)} • ${duration}`;
     }
     // Otherwise show the obtained date
-    return formatDate(cert.date_obtained);
+    return cert.date_obtained
+      ? formatDate(cert.date_obtained)
+      : "Date not available";
   };
 
   // Centralized Water-Style Loader
