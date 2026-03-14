@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
+import { Check } from "lucide-react"; // or lucide-react
 
 export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
   const [progress, setProgress] = useState(0);
@@ -10,7 +10,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
   const [isNameLoaded, setIsNameLoaded] = useState(false);
   const [canShowSuccess, setCanShowSuccess] = useState(false);
 
-  // 1. Fetch Name First
+  // 1. Fetch Name (Keep logic, just trigger start)
   useEffect(() => {
     const fetchName = async () => {
       try {
@@ -24,15 +24,15 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
       } catch (error) {
         setDisplayName("HARMIN PATEL");
       } finally {
-        setIsNameLoaded(true); // This acts as the "Start" trigger
+        setIsNameLoaded(true);
       }
     };
     fetchName();
   }, []);
 
-  // 2. Start Progress ONLY after name is loaded
+  // 2. Faster Progress (Reduced interval from 20ms to 12ms)
   useEffect(() => {
-    if (!isNameLoaded) return; // Wait here until API responds
+    if (!isNameLoaded) return;
 
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -40,21 +40,19 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
         clearInterval(interval);
         return 100;
       });
-    }, 20);
+    }, 12);
 
     return () => clearInterval(interval);
   }, [isNameLoaded]);
 
-  // 3. Sequential Success Logic
+  // 3. Snappier Success Logic (Buffers reduced significantly)
   useEffect(() => {
     if (progress === 100 && isNameLoaded) {
-      // Small buffer to let the last letter finish its motion
       const timer = setTimeout(() => {
         setCanShowSuccess(true);
-        
-        // Final exit
-        setTimeout(onFinish, 1500);
-      }, 500); 
+        // Reduced from 1500ms to 800ms
+        setTimeout(onFinish, 800);
+      }, 250); 
 
       return () => clearTimeout(timer);
     }
@@ -62,20 +60,21 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
 
   const nameArray = displayName.split("");
   const isComplete = canShowSuccess; 
-  const pulseDuration = isComplete ? 2 : 5 - (progress / 100) * 4.2;
+  const pulseDuration = isComplete ? 1.5 : 4 - (progress / 100) * 3;
 
   return (
     <motion.div
       initial={{ opacity: 1 }}
       exit={{
-        scaleY: 0.002,
-        scaleX: 1.4,
+        scaleY: 0.005,
+        scaleX: 1.2,
         opacity: 0,
-        filter: "brightness(4) blur(2px)",
-        transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] },
+        filter: "brightness(3) blur(4px)",
+        transition: { duration: 0.4, ease: [0.19, 1, 0.22, 1] },
       }}
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#050505] text-white overflow-hidden selection:bg-none"
     >
+      {/* CRT Scanline Effect */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(255,255,255,0.25)_50%)] bg-[length:100%_3px] md:bg-[length:100%_4px]" />
 
       <motion.div
@@ -88,35 +87,32 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
             ? "rgba(52, 211, 153, 0.4)"
             : "rgba(255, 255, 255, 0.12)",
         }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-        className="relative w-[90%] h-[85%] md:w-[85%] md:h-[80%] flex items-center justify-center border rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden transition-colors duration-1000"
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative w-[90%] h-[85%] md:w-[85%] md:h-[80%] flex items-center justify-center border rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden transition-colors duration-700"
         style={{
           boxShadow: isComplete
             ? "inset 0 0 50px rgba(52, 211, 153, 0.12)"
             : "inset 0 0 20px rgba(255, 255, 255, 0.02)",
         }}
       >
+        {/* Background Glow */}
         <motion.div
           animate={{
-            scale: isComplete ? [1, 1.25, 1] : [1, 1.15, 1],
-            opacity: isComplete ? 0.45 : [0.08, 0.2, 0.08],
+            scale: isComplete ? [1, 1.2, 1] : [1, 1.1, 1],
+            opacity: isComplete ? 0.4 : [0.08, 0.15, 0.08],
           }}
           transition={{
             duration: pulseDuration,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className={`absolute w-[300px] h-[300px] md:w-[600px] md:h-[600px] blur-[80px] md:blur-[130px] rounded-full transition-all duration-1000 ${
+          className={`absolute w-[300px] h-[300px] md:w-[600px] md:h-[600px] blur-[80px] md:blur-[130px] rounded-full transition-all duration-700 ${
             isComplete ? "bg-emerald-400/30" : "bg-blue-600/15"
           }`}
         />
 
         <div className="relative flex flex-col items-center z-10 px-4 w-full text-center">
           <div className="overflow-hidden py-4 min-h-[60px] md:min-h-[80px] flex items-center justify-center">
-            {/* We only show the h1 once the name is loaded. 
-              Because the bar only starts AFTER this, the name 
-              will always be ready to animate.
-            */}
             <AnimatePresence>
               {isNameLoaded && (
                 <motion.h1
@@ -140,27 +136,29 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                           skewX: 0,
                           filter: "blur(0px)",
                           transition: {
-                            duration: 0.8,
+                            duration: 0.6,
                             ease: [0.22, 1, 0.36, 1],
-                            delay: i * 0.03,
+                            delay: i * 0.02,
                           },
                         },
                       }}
                       className="inline-block relative"
                     >
                       {char === " " ? "\u00A0" : char}
+                      
+                      {/* Restored Shimmer Animation */}
                       <motion.span
                         animate={{
-                          opacity: isComplete ? [0, 0.6, 0] : [0, 0.7, 0],
+                          opacity: isComplete ? [0, 0.4, 0] : [0, 0.6, 0],
                           left: ["-150%", "250%"],
                         }}
                         transition={{
                           duration: 1.2,
                           repeat: Infinity,
-                          delay: 1 + i * 0.08,
-                          repeatDelay: 2.5,
+                          delay: 0.5 + i * 0.05,
+                          repeatDelay: 2,
                         }}
-                        className="absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                        className="absolute inset-0 skew-x-12 pointer-events-none bg-gradient-to-r from-transparent via-white/30 to-transparent"
                       />
                     </motion.span>
                   ))}
@@ -169,10 +167,11 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
             </AnimatePresence>
           </div>
 
+          {/* Status and Progress Bar */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 1 }} // Reduced delay so it appears with the name
+            transition={{ delay: 0.1, duration: 0.6 }}
             className="flex flex-col items-center gap-4 mt-2"
           >
             <div className="flex items-center gap-2">
@@ -191,7 +190,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                 )}
               </AnimatePresence>
               <span
-                className={`text-[8px] md:text-[9px] uppercase tracking-[0.4em] md:tracking-[0.6em] font-bold transition-all duration-700 ${isComplete ? "text-emerald-400" : "text-zinc-500"}`}
+                className={`text-[8px] md:text-[9px] uppercase tracking-[0.4em] md:tracking-[0.6em] font-bold transition-all duration-500 ${isComplete ? "text-emerald-400" : "text-zinc-500"}`}
               >
                 {isComplete ? "Connection Secured" : "Establishing Connection"}
               </span>
@@ -206,22 +205,19 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                     backgroundColor: isComplete ? "#10b981" : "#3b82f6",
                   }}
                   transition={{
-                    ease: "linear", // Linear is smoother for a pure loading bar
-                    duration: 0.02,
-                    backgroundColor: { duration: 0.6 },
+                    ease: "linear",
+                    duration: 0.01,
                   }}
                   className="absolute inset-0"
                   style={{
-                    boxShadow: isComplete
-                      ? "0 0 20px rgba(16,185,129,0.8)"
-                      : "",
+                    boxShadow: isComplete ? "0 0 15px rgba(16,185,129,0.5)" : "",
                   }}
                 />
               </div>
 
               <div className="flex justify-between w-32 md:w-44 px-1">
                 <span
-                  className={`text-[6px] md:text-[7px] font-mono tracking-tighter uppercase transition-colors duration-700 ${isComplete ? "text-emerald-500" : "text-zinc-700"}`}
+                  className={`text-[6px] md:text-[7px] font-mono tracking-tighter uppercase transition-colors duration-500 ${isComplete ? "text-emerald-500" : "text-zinc-700"}`}
                 >
                   {isComplete ? "SYSTEM_READY" : `LOAD_0${progress}%`}
                 </span>
