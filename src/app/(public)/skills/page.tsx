@@ -10,32 +10,69 @@ const categories = ["frontend", "backend", "database", "tools"] as const;
 const getIconSlug = (name: string) => {
   const normalized = name.toLowerCase().trim();
   const map: Record<string, string> = {
-    html: "html5", css: "css3", js: "javascript", ts: "typescript",
-    next: "nextdotjs", node: "nodedotjs", gemini: "googlegemini",
-    chatgpt: "openai", openai: "openai", perplexity: "perplexity",
-    claude: "anthropic", net: "dotnet", ".net": "dotnet", aspnet: "dotnet",
-    aspdotnetcoremvc: "dotnet", "asp.net core mvc": "dotnet",
+    html: "html5",
+    css: "css3",
+    js: "javascript",
+    ts: "typescript",
+    next: "nextdotjs",
+    node: "nodedotjs",
+    gemini: "googlegemini",
+    chatgpt: "openai",
+    openai: "openai",
+    perplexity: "perplexity",
+    claude: "anthropic",
+    net: "dotnet",
+    ".net": "dotnet",
+    aspnet: "dotnet",
+    aspdotnetcoremvc: "dotnet",
+    "asp.net core mvc": "dotnet",
     "sql server": "microsoftsqlserver",
     "sql server management studio": "microsoftsqlserver",
-    ssms: "microsoftsqlserver", "visual studio": "visualstudio",
-    vscode: "visualstudiocode", photoshop: "adobephotoshop",
-    lightroom: "adobelightroom", premiere: "adobepremierepro",
-    "after effects": "adobeaftereffects", "da vinci": "davinciresolve",
-    capcut: "capcut", figma: "figma",
+    ssms: "microsoftsqlserver",
+    "visual studio": "visualstudio",
+    vscode: "visualstudiocode",
+    photoshop: "adobephotoshop",
+    lightroom: "adobelightroom",
+    premiere: "adobepremierepro",
+    "after effects": "adobeaftereffects",
+    "da vinci": "davinciresolve",
+    capcut: "capcut",
+    figma: "figma",
   };
   if (map[normalized]) return map[normalized];
   return normalized
-    .replace(/\s+/g, "").replace(/\.js/g, "dotjs")
-    .replace(/\./g, "dot").replace(/[^a-z0-9]/g, "");
+    .replace(/\s+/g, "")
+    .replace(/\.js/g, "dotjs")
+    .replace(/\./g, "dot")
+    .replace(/[^a-z0-9]/g, "");
 };
 
 // Icons whose brand color is black/very dark — need light override in dark mode
 const DARK_ICONS = new Set([
-  "github", "x", "xdotcom", "notion", "vercel", "nextdotjs", "figma",
-  "openai", "anthropic", "apple", "stripe", "linear", "raycast",
-  "microsoftsqlserver", "visualstudio", "visualstudiocode", "dotnet",
-  "adobephotoshop", "adobelightroom", "adobepremierepro", "adobeaftereffects",
-  "capcut", "davinciresolve", "perplexity",
+  "github",
+  "x",
+  "xdotcom",
+  "notion",
+  "vercel",
+  "nextdotjs",
+  "figma",
+  "openai",
+  "anthropic",
+  "apple",
+  "stripe",
+  "linear",
+  "raycast",
+  "microsoftsqlserver",
+  "visualstudio",
+  "visualstudiocode",
+  "dotnet",
+  "adobephotoshop",
+  "adobelightroom",
+  "adobepremierepro",
+  "adobeaftereffects",
+  "capcut",
+  "davinciresolve",
+  "perplexity",
 ]);
 
 function SkillIcon({ name, isDark }: { name: string; isDark: boolean }) {
@@ -100,7 +137,10 @@ export default function Skills() {
   useEffect(() => {
     fetch("/api/skills")
       .then((res) => res.json())
-      .then((data) => { setSkills(data); setIsLoading(false); })
+      .then((data) => {
+        setSkills(data);
+        setIsLoading(false);
+      })
       .catch(() => setIsLoading(false));
   }, []);
 
@@ -185,7 +225,9 @@ export default function Skills() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onMouseEnter={() => { if (window.innerWidth > 1024) setActiveCat(cat); }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 1024) setActiveCat(cat);
+                }}
                 onClick={() => setActiveCat(cat)}
                 className="group relative flex-shrink-0 lg:w-full text-left py-3 md:py-4 px-5 rounded-xl transition-all overflow-hidden"
               >
@@ -193,17 +235,26 @@ export default function Skills() {
                   <motion.div
                     layoutId="nav-pill"
                     className="absolute inset-0 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-xl dark:shadow-none"
-                    style={{ backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
+                    style={{
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                    }}
                   />
                 ) : (
                   <div className="absolute inset-0 rounded-xl bg-transparent group-hover:bg-zinc-100 dark:group-hover:bg-white/[0.04] border border-transparent group-hover:border-zinc-200 dark:group-hover:border-white/8 transition-all duration-300" />
                 )}
                 <div className="relative z-10 flex items-center justify-between gap-4">
-                  <span className={`text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black transition-all ${activeCat === cat ? "text-blue-600 dark:text-blue-400" : "text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-900 dark:group-hover:text-zinc-300"}`}>
+                  <span
+                    className={`text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black transition-all ${activeCat === cat ? "text-blue-600 dark:text-blue-400" : "text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-900 dark:group-hover:text-zinc-300"}`}
+                  >
                     {cat}
                   </span>
                   {activeCat === cat && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-1 h-1 rounded-full bg-blue-600 dark:bg-blue-400" />
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-1 h-1 rounded-full bg-blue-600 dark:bg-blue-400"
+                    />
                   )}
                 </div>
               </button>
@@ -212,7 +263,11 @@ export default function Skills() {
 
           {/* Skills Grid */}
           <motion.div
-            style={{ rotateY: mousePos.x / 8, rotateX: -mousePos.y / 8, perspective: "1400px" }}
+            style={{
+              rotateY: mousePos.x / 8,
+              rotateX: -mousePos.y / 8,
+              perspective: "1400px",
+            }}
             className="w-full"
           >
             <AnimatePresence mode="wait">
@@ -229,7 +284,11 @@ export default function Skills() {
                     key={skill.id}
                     initial={{ opacity: 0, scale: 0.94, y: 14 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{
+                      delay: idx * 0.05,
+                      duration: 0.38,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                     whileHover={{ y: -3, scale: 1.02 }}
                     className="group relative rounded-3xl overflow-hidden cursor-default"
                     style={{
@@ -264,7 +323,13 @@ export default function Skills() {
                         {/* Level bars */}
                         <div className="flex flex-col gap-[3px] pt-0.5">
                           {[1, 2, 3].map((dot) => {
-                            const filled = dot <= (skill.level === "advanced" ? 3 : skill.level === "intermediate" ? 2 : 1);
+                            const filled =
+                              dot <=
+                              (skill.level === "advanced"
+                                ? 3
+                                : skill.level === "intermediate"
+                                  ? 2
+                                  : 1);
                             return (
                               <div
                                 key={dot}
@@ -300,7 +365,7 @@ export default function Skills() {
           --card-bg: rgba(255, 255, 255, 0.55);
           --card-border: rgba(0, 0, 0, 0.07);
           --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-          --card-hover-shimmer: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(147,197,253,0.04) 100%);
+          --card-hover-shimmer: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
           --icon-bg: rgba(255, 255, 255, 0.8);
           --icon-border: rgba(0, 0, 0, 0.08);
           --icon-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1);
@@ -309,7 +374,7 @@ export default function Skills() {
           --card-bg: rgba(255, 255, 255, 0.04);
           --card-border: rgba(255, 255, 255, 0.08);
           --card-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 24px rgba(0,0,0,0.5);
-          --card-hover-shimmer: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(255,255,255,0.03) 100%);
+          --card-hover-shimmer: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
           --icon-bg: rgba(255, 255, 255, 0.07);
           --icon-border: rgba(255, 255, 255, 0.12);
           --icon-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 12px rgba(0,0,0,0.3);
