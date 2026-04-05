@@ -27,6 +27,8 @@ export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
+  const [displayedCount, setDisplayedCount] = useState(4);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -67,7 +69,17 @@ export default function Blog() {
   };
 
   const featuredPost = posts[0];
-  const restPosts = posts.slice(1);
+  const restPosts = posts.slice(1, displayedCount);
+  const hasMorePosts = posts.length > displayedCount;
+
+  const handleLoadMore = () => {
+    setIsLoadingMore(true);
+    // Simulate slight loading delay for smooth UX
+    setTimeout(() => {
+      setDisplayedCount((prev) => prev + 6);
+      setIsLoadingMore(false);
+    }, 300);
+  };
 
   // Centralized Water-Style Loader
   if (isLoading)
@@ -283,6 +295,34 @@ export default function Blog() {
                   </motion.div>
                 ))}
               </div>
+
+              {hasMorePosts && (
+                <motion.div
+                  variants={itemVariants}
+                  className="flex justify-center mt-12"
+                >
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={isLoadingMore}
+                    className="group relative inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-950/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        Load More Articles
+                        <ArrowRight
+                          size={16}
+                          className="group-hover:translate-x-1 transition-transform"
+                        />
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+              )}
             </div>
           )}
         </div>
