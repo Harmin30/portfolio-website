@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   Github,
   ArrowUpRight,
@@ -11,7 +11,13 @@ import {
   Zap,
   X,
 } from "lucide-react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  Variants,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { Project } from "@/types";
 import { supabase } from "@/lib/supabase";
 
@@ -35,12 +41,208 @@ const itemVariants: Variants = {
   },
 };
 
+function InteractiveGitButton({ url }: { url: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setIsTouchDevice(() => window.matchMedia("(hover: none)").matches);
+  }, []);
+
+  const handleInteraction = (isActive: boolean) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    if (isActive) {
+      setIsExpanded(true);
+    } else {
+      timeoutRef.current = setTimeout(() => {
+        setIsExpanded(false);
+      }, 200);
+    }
+  };
+
+  return (
+    <motion.a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => handleInteraction(true)}
+      onMouseLeave={() => handleInteraction(false)}
+      onTouchStart={() => handleInteraction(true)}
+      onTouchEnd={() => handleInteraction(false)}
+      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black overflow-hidden group active:scale-95 transition-colors"
+      whileTap={{ scale: 0.95 }}
+    >
+      {/* Smooth shadow glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full blur-md"
+        animate={{
+          boxShadow: isExpanded
+            ? "0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15)"
+            : "0 0 0px rgba(0, 0, 0, 0)",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        style={{ pointerEvents: "none" }}
+      />
+
+      <motion.div
+        className="flex items-center justify-center relative z-10"
+        animate={{
+          gap: isExpanded ? 8 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      >
+        <motion.span
+          animate={{
+            opacity: isExpanded ? 1 : 0,
+            width: isExpanded ? "auto" : 0,
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="text-xs font-bold uppercase tracking-widest whitespace-nowrap"
+        >
+          Code
+        </motion.span>
+
+        <Github size={16} />
+      </motion.div>
+    </motion.a>
+  );
+}
+
+function InteractiveLiveButton({ url }: { url: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setIsTouchDevice(() => window.matchMedia("(hover: none)").matches);
+  }, []);
+
+  const handleInteraction = (isActive: boolean) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    if (isActive) {
+      setIsExpanded(true);
+    } else {
+      timeoutRef.current = setTimeout(() => {
+        setIsExpanded(false);
+      }, 200);
+    }
+  };
+
+  return (
+    <motion.a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => handleInteraction(true)}
+      onMouseLeave={() => handleInteraction(false)}
+      onTouchStart={() => handleInteraction(true)}
+      onTouchEnd={() => handleInteraction(false)}
+      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md shadow-purple-500/10 overflow-hidden group active:scale-95 transition-colors"
+      whileTap={{ scale: 0.95 }}
+    >
+      {/* Smooth shadow glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full blur-md"
+        animate={{
+          boxShadow: isExpanded
+            ? "0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.2)"
+            : "0 0 0px rgba(168, 85, 247, 0)",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        style={{ pointerEvents: "none" }}
+      />
+
+      <motion.div
+        className="flex items-center justify-center relative z-10"
+        animate={{
+          gap: isExpanded ? 8 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      >
+        <motion.span
+          animate={{
+            opacity: isExpanded ? 1 : 0,
+            width: isExpanded ? "auto" : 0,
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="text-xs font-bold uppercase tracking-widest whitespace-nowrap"
+        >
+          Live
+        </motion.span>
+
+        <motion.div
+          animate={{
+            rotate: isExpanded ? 45 : 0,
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="flex-shrink-0"
+        >
+          <ArrowUpRight size={16} strokeWidth={2} />
+        </motion.div>
+      </motion.div>
+    </motion.a>
+  );
+}
+
+function ScrollAnimatedCard({
+  children,
+  index,
+}: {
+  children: React.ReactNode;
+  index: number;
+}) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  // Parallax effect - cards move slower than scroll (reduced for smoother mobile feel)
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    [0.95, 1, 1, 0.97],
+  );
+
+  // Rotate effect for a premium feel (reduced for smoother animation)
+  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        y,
+        opacity,
+        scale,
+        rotateX,
+        perspective: "1200px",
+      }}
+      transition={{ type: "spring", stiffness: 30, damping: 20 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  // Image parallax - moves faster than container for depth
+  const imageY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   return (
-    <>
+    <div ref={ref} className="relative w-full h-full overflow-hidden">
       {!loaded && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 animate-pulse">
           <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
@@ -51,15 +253,16 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
           <Command size={20} className="text-zinc-300 dark:text-zinc-600" />
         </div>
       ) : (
-        <img
+        <motion.img
           src={src}
           alt={alt}
+          style={{ y: imageY }}
           className={`absolute inset-0 w-full h-full object-cover md:transition-transform md:duration-700 md:ease-out md:group-hover:scale-105 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
           onLoad={() => setLoaded(true)}
           onError={() => setError(true)}
         />
       )}
-    </>
+    </div>
   );
 }
 
@@ -174,7 +377,7 @@ export default function Projects() {
 
         <motion.div
           variants={containerVariants}
-          className="grid grid-cols-1 gap-6 md:gap-10"
+          className="grid grid-cols-1 gap-3 md:gap-6"
         >
           {projects.length === 0 && (
             <motion.div
@@ -211,79 +414,67 @@ export default function Projects() {
           )}
 
           <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                layout
-                variants={itemVariants}
-                exit={{ opacity: 0, scale: 0.98 }}
-                className="group"
-              >
-                {/* COMPACT CARD DESIGN FOR MOBILE */}
-                <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl">
-                  {/* Smaller Responsive Image */}
-                  <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
-                    {project.image ? (
-                      <ProjectImage src={project.image} alt={project.title} />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
-                          No Image
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-grow space-y-4 w-full">
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="space-y-1.5">
-                        <h2 className="text-lg md:text-2xl font-black tracking-tight uppercase leading-tight">
-                          {project.title}
-                        </h2>
-                        <div className="h-0.5 w-6 bg-purple-500 rounded-full" />
-                      </div>
-
-                      <div className="flex gap-2">
-                        {project.github_url && (
-                          <a
-                            href={project.github_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
-                          >
-                            <Github size={16} />
-                          </a>
-                        )}
-                        {project.live_url && (
-                          <a
-                            href={project.live_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 transition-all shadow-lg"
-                          >
-                            <ArrowUpRight size={18} />
-                          </a>
-                        )}
-                      </div>
+            {filteredProjects.map((project, idx) => (
+              <ScrollAnimatedCard key={project.id} index={idx}>
+                <motion.div
+                  key={project.id}
+                  layout
+                  variants={itemVariants}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="group"
+                >
+                  {/* COMPACT CARD DESIGN FOR MOBILE */}
+                  <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl">
+                    {/* Smaller Responsive Image */}
+                    <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
+                      {project.image ? (
+                        <ProjectImage src={project.image} alt={project.title} />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
+                            No Image
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-base leading-relaxed font-normal">
-                      {project.description}
-                    </p>
+                    <div className="flex-grow space-y-4 w-full">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1.5">
+                          <h2 className="text-lg md:text-2xl font-black tracking-tight uppercase leading-tight">
+                            {project.title}
+                          </h2>
+                          <div className="h-0.5 w-6 bg-purple-500 rounded-full" />
+                        </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {project.tech_stack?.map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-[8px] md:text-[9px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase bg-white/50 dark:bg-zinc-800/50"
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                        <div className="flex gap-2">
+                          {project.github_url && (
+                            <InteractiveGitButton url={project.github_url} />
+                          )}
+                          {project.live_url && (
+                            <InteractiveLiveButton url={project.live_url} />
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-base leading-relaxed font-normal">
+                        {project.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {project.tech_stack?.map((tech) => (
+                          <span
+                            key={tech}
+                            className="text-[8px] md:text-[9px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase bg-white/50 dark:bg-zinc-800/50"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </ScrollAnimatedCard>
             ))}
           </AnimatePresence>
         </motion.div>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import { Calendar, ArrowRight, Loader2, Star, FileText } from "lucide-react";
 import { BlogPost } from "@/types";
 
@@ -22,6 +22,42 @@ const itemVariants: Variants = {
     transition: { type: "spring", stiffness: 100, damping: 15 },
   },
 };
+
+function ScrollAnimatedCard({ children }: { children: React.ReactNode }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  // Parallax effect - cards move slower than scroll
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    [0.85, 1, 1, 0.95],
+  );
+
+  // Rotate effect for a premium feel
+  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [12, 0, -12]);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        y,
+        opacity,
+        scale,
+        rotateX,
+        perspective: "1200px",
+      }}
+      transition={{ type: "spring", stiffness: 30, damping: 20 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -243,56 +279,54 @@ export default function Blog() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {restPosts.map((post) => (
-                  <motion.div
-                    key={post.id}
-                    variants={itemVariants}
-                    className="group"
-                  >
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="flex flex-col h-full"
-                    >
-                      <div className="aspect-[16/10] mb-6 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/50 relative">
-                        {loadingImages.has(`post-${post.id}`) && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 animate-pulse">
-                            <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
-                          </div>
-                        )}
-                        {post.image && (
-                          <img
-                            src={post.image}
-                            alt={post.title}
-                            onLoadStart={() =>
-                              handleImageStart(`post-${post.id}`)
-                            }
-                            onLoad={() => handleImageLoad(`post-${post.id}`)}
-                            className={`w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 ${
-                              loadingImages.has(`post-${post.id}`)
-                                ? "opacity-0"
-                                : "opacity-80"
-                            }`}
+                  <ScrollAnimatedCard key={post.id}>
+                    <motion.div variants={itemVariants} className="group">
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="flex flex-col h-full"
+                      >
+                        <div className="aspect-[16/10] mb-6 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/50 relative">
+                          {loadingImages.has(`post-${post.id}`) && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 animate-pulse">
+                              <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+                            </div>
+                          )}
+                          {post.image && (
+                            <img
+                              src={post.image}
+                              alt={post.title}
+                              onLoadStart={() =>
+                                handleImageStart(`post-${post.id}`)
+                              }
+                              onLoad={() => handleImageLoad(`post-${post.id}`)}
+                              className={`w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 ${
+                                loadingImages.has(`post-${post.id}`)
+                                  ? "opacity-0"
+                                  : "opacity-80"
+                              }`}
+                            />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-3">
+                          <span className="text-amber-500">•</span>
+                          {formatDate(post.published_at || post.created_at)}
+                        </div>
+                        <h4 className="text-xl font-bold mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2">
+                          {post.title}
+                        </h4>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm leading-relaxed line-clamp-2 mb-6">
+                          {post.excerpt}
+                        </p>
+                        <div className="mt-auto flex items-center gap-2 text-xs font-bold text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                          View Post{" "}
+                          <ArrowRight
+                            size={14}
+                            className="group-hover:translate-x-1 transition-transform"
                           />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-3">
-                        <span className="text-amber-500">•</span>
-                        {formatDate(post.published_at || post.created_at)}
-                      </div>
-                      <h4 className="text-xl font-bold mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2">
-                        {post.title}
-                      </h4>
-                      <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm leading-relaxed line-clamp-2 mb-6">
-                        {post.excerpt}
-                      </p>
-                      <div className="mt-auto flex items-center gap-2 text-xs font-bold text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
-                        View Post{" "}
-                        <ArrowRight
-                          size={14}
-                          className="group-hover:translate-x-1 transition-transform"
-                        />
-                      </div>
-                    </Link>
-                  </motion.div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  </ScrollAnimatedCard>
                 ))}
               </div>
 
