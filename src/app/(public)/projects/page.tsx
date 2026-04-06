@@ -15,8 +15,6 @@ import {
   motion,
   AnimatePresence,
   Variants,
-  useScroll,
-  useTransform,
 } from "framer-motion";
 import { Project } from "@/types";
 import { supabase } from "@/lib/supabase";
@@ -194,65 +192,15 @@ function ScrollAnimatedCard({
   children: React.ReactNode;
   index: number;
 }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 80%", "end 20%"],
-  });
-
-  // Subtle parallax for smooth movement
-  const y = useTransform(scrollYProgress, [0, 1], [30, -30]);
-
-  // Smooth opacity fade using easing
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.15, 0.85, 1],
-    [0, 1, 1, 0],
-    {
-      clamp: true,
-    },
-  );
-
-  // Subtle scale for depth without jerks
-  const scale = useTransform(
-    scrollYProgress,
-    [0, 0.1, 0.9, 1],
-    [0.97, 1, 1, 0.98],
-    {
-      clamp: true,
-    },
-  );
-
-  return (
-    <motion.div
-      ref={ref}
-      style={{
-        y,
-        opacity,
-        scale,
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <motion.div>{children}</motion.div>;
 }
 
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 80%", "end 20%"],
-  });
-
-  // Subtle image parallax for smooth depth
-  const imageY = useTransform(scrollYProgress, [0, 1], [-15, 15], {
-    clamp: true,
-  });
 
   return (
-    <div ref={ref} className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       {!loaded && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 animate-pulse">
           <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
@@ -266,7 +214,6 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
         <motion.img
           src={src}
           alt={alt}
-          style={{ y: imageY }}
           className={`absolute inset-0 w-full h-full object-cover md:transition-transform md:duration-700 md:ease-out md:group-hover:scale-105 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
           onLoad={() => setLoaded(true)}
           onError={() => setError(true)}

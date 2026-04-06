@@ -52,14 +52,14 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
         setCanShowSuccess(true);
         // Reduced from 1500ms to 800ms
         setTimeout(onFinish, 800);
-      }, 250); 
+      }, 250);
 
       return () => clearTimeout(timer);
     }
   }, [progress, isNameLoaded, onFinish]);
 
   const nameArray = displayName.split("");
-  const isComplete = canShowSuccess; 
+  const isComplete = canShowSuccess;
   const pulseDuration = isComplete ? 1.5 : 4 - (progress / 100) * 3;
 
   return (
@@ -145,7 +145,7 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                       className="inline-block relative"
                     >
                       {char === " " ? "\u00A0" : char}
-                      
+
                       {/* Restored Shimmer Animation */}
                       <motion.span
                         animate={{
@@ -210,7 +210,9 @@ export default function LandingIntro({ onFinish }: { onFinish: () => void }) {
                   }}
                   className="absolute inset-0"
                   style={{
-                    boxShadow: isComplete ? "0 0 15px rgba(16,185,129,0.5)" : "",
+                    boxShadow: isComplete
+                      ? "0 0 15px rgba(16,185,129,0.5)"
+                      : "",
                   }}
                 />
               </div>

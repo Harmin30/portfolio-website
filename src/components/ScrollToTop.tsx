@@ -7,11 +7,11 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 export function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
   const { scrollYProgress } = useScroll();
-  
+
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   useEffect(() => {
@@ -46,7 +46,10 @@ export function ScrollToTop() {
                      group flex items-center justify-center"
         >
           {/* Progress Ring */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 40 40">
+          <svg
+            className="absolute inset-0 w-full h-full -rotate-90"
+            viewBox="0 0 40 40"
+          >
             <circle
               cx="20"
               cy="20"

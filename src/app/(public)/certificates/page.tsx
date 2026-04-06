@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  motion,
-  AnimatePresence,
-  Variants,
-} from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ExternalLink, Loader2, Award, Star, Zap } from "lucide-react";
 import { Certificate } from "@/types";
 import { supabase } from "@/lib/supabase";
