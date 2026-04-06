@@ -214,28 +214,6 @@ export function Navbar() {
                         />
                       )}
 
-                      <motion.div
-                        animate={{
-                          scale: active ? 1.2 : 1,
-                        }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 20,
-                        }}
-                        className={`relative z-20 transition-colors ${
-                          active
-                            ? "text-blue-500 dark:text-blue-400"
-                            : "text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200"
-                        }`}
-                      >
-                        <Icon
-                          size={16}
-                          className="sm:size-[18px]"
-                          strokeWidth={2}
-                        />
-                      </motion.div>
-
                       <motion.span
                         animate={{
                           scale: active ? 1 : 0.9,
