@@ -289,12 +289,12 @@ export function Navbar() {
           /* HOME PAGE - Expanded Navigation Menu */
           <motion.nav
             key="expanded-nav"
-            initial={{ y: 100, opacity: 0, scale: 0.95 }}
+            initial={{ y: 80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            exit={{ y: 60, opacity: 0, scale: 0.95 }}
             transition={{
-              duration: 0.35,
-              ease: "easeOut",
+              duration: 0.25,
+              ease: "easeInOut",
             }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
@@ -433,12 +433,12 @@ export function Navbar() {
           /* NON-HOME PAGES - Expanded Navigation Menu */
           <motion.nav
             key="expanded-nav-non-home"
-            initial={{ y: 100, opacity: 0, scale: 0.95 }}
+            initial={{ y: 80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            exit={{ y: 60, opacity: 0, scale: 0.95 }}
             transition={{
-              duration: 0.35,
-              ease: "easeOut",
+              duration: 0.25,
+              ease: "easeInOut",
             }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >

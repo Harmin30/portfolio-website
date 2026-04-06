@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, Variants, useScroll, useTransform } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Calendar, ArrowRight, Loader2, Star, FileText } from "lucide-react";
 import { BlogPost } from "@/types";
 
@@ -24,39 +24,7 @@ const itemVariants: Variants = {
 };
 
 function ScrollAnimatedCard({ children }: { children: React.ReactNode }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  // Parallax effect - cards move slower than scroll
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const scale = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.8, 1],
-    [0.85, 1, 1, 0.95],
-  );
-
-  // Rotate effect for a premium feel
-  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [12, 0, -12]);
-
-  return (
-    <motion.div
-      ref={ref}
-      style={{
-        y,
-        opacity,
-        scale,
-        rotateX,
-        perspective: "1200px",
-      }}
-      transition={{ type: "spring", stiffness: 30, damping: 20 }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <motion.div>{children}</motion.div>;
 }
 
 export default function Blog() {
