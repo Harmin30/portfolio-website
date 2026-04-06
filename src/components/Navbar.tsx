@@ -189,7 +189,7 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Main floating pill */}
-            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-1.5 sm:px-2 py-1.5 sm:py-2 overflow-hidden will-change-transform">
+            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-1.5 sm:px-2 py-1.5 sm:py-2 overflow-hidden will-change-transform backdrop-blur-md">
               {/* Navigation items */}
               <div className="relative flex items-center gap-1.5 z-10">
                 {mainNavTabs.map((link) => {
@@ -299,7 +299,7 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform">
+            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-md">
               <div className="relative z-10 grid grid-cols-4 gap-1.5 mb-3">
                 {expandedNavTabs.map((link, idx) => {
                   const active = isActive(link.href);
@@ -390,7 +390,7 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Minimal pill */}
-            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-2.5 sm:px-3.5 py-2 sm:py-2.5 overflow-hidden flex items-center gap-1.5 sm:gap-2 will-change-transform">
+            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-2.5 sm:px-3.5 py-2 sm:py-2.5 overflow-hidden flex items-center gap-1.5 sm:gap-2 will-change-transform backdrop-blur-md">
               {/* Current page display */}
               <div className="relative flex items-center gap-1.5 z-10">
                 {currentPage && (
@@ -443,7 +443,7 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform">
+            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-md">
               <div className="relative z-10 grid grid-cols-4 gap-1.5 mb-3">
                 {expandedNavTabs.map((link, idx) => {
                   const active = isActive(link.href);

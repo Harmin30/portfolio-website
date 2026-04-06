@@ -11,11 +11,7 @@ import {
   Zap,
   X,
 } from "lucide-react";
-import {
-  motion,
-  AnimatePresence,
-  Variants,
-} from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Project } from "@/types";
 import { supabase } from "@/lib/supabase";
 
