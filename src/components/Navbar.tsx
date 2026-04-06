@@ -48,25 +48,43 @@ export function Navbar() {
   const [expandedNav, setExpandedNav] = useState(false);
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("up");
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrollVelocity, setScrollVelocity] = useState(0);
   const pathname = usePathname();
 
   useEffect(() => {
+    let rafId: number;
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
 
-      // Detect scroll direction - don't touch expandedNav, let it only be controlled by arrow clicks
-      if (window.scrollY > lastScrollY + 10) {
-        // Scrolling down
+      // Calculate scroll velocity for smooth detection
+      const velocity = window.scrollY - lastScrollY;
+      setScrollVelocity(velocity);
+
+      // Always show navbar when at or near the top
+      if (window.scrollY <= 10) {
+        setScrollDirection("up");
+      } else if (velocity > 15) {
+        // Scrolling down with threshold
         setScrollDirection("down");
-      } else if (window.scrollY < lastScrollY - 10) {
-        // Scrolling up
+      } else if (velocity < -15) {
+        // Scrolling up with threshold
         setScrollDirection("up");
       }
       setLastScrollY(window.scrollY);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const scrollListener = () => {
+      // Debounce scroll detection with RAF for smoother updates
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener("scroll", scrollListener, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", scrollListener);
+      cancelAnimationFrame(rafId);
+    };
   }, [lastScrollY]);
 
   const isActive = (href: string) =>
@@ -161,16 +179,14 @@ export function Navbar() {
         {isHome && scrollDirection === "up" && !expandedNav ? (
           <motion.nav
             key="compact-nav"
-            initial={{ y: 150, opacity: 0.95, scale: 0.9 }}
+            initial={{ y: 100, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 100, opacity: 0, scale: 0.95 }}
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 28,
-              mass: 1,
+              duration: 0.35,
+              ease: "easeOut",
             }}
-            className="fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Main floating pill */}
             <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-1.5 sm:px-2 py-1.5 sm:py-2 overflow-hidden will-change-transform">
@@ -273,16 +289,14 @@ export function Navbar() {
           /* HOME PAGE - Expanded Navigation Menu */
           <motion.nav
             key="expanded-nav"
-            initial={{ y: 150, opacity: 0.95, scale: 0.85 }}
+            initial={{ y: 100, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.9 }}
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 28,
-              mass: 1,
+              duration: 0.35,
+              ease: "easeOut",
             }}
-            className="fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
             <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform">
@@ -366,16 +380,14 @@ export function Navbar() {
           /* NON-HOME PAGES - Minimal Pill */
           <motion.nav
             key="minimal-nav"
-            initial={{ y: 150, opacity: 0.95, scale: 0.9 }}
+            initial={{ y: 100, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 100, opacity: 0, scale: 0.95 }}
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 28,
-              mass: 1,
+              duration: 0.35,
+              ease: "easeOut",
             }}
-            className="fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Minimal pill */}
             <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-2.5 sm:px-3.5 py-2 sm:py-2.5 overflow-hidden flex items-center gap-1.5 sm:gap-2 will-change-transform">
@@ -421,16 +433,14 @@ export function Navbar() {
           /* NON-HOME PAGES - Expanded Navigation Menu */
           <motion.nav
             key="expanded-nav-non-home"
-            initial={{ y: 150, opacity: 0.95, scale: 0.85 }}
+            initial={{ y: 100, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.9 }}
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 28,
-              mass: 1,
+              duration: 0.35,
+              ease: "easeOut",
             }}
-            className="fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
             <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform">
@@ -517,7 +527,7 @@ export function Navbar() {
       <style>{`
         @media (max-width: 1024px) {
           body {
-            padding-bottom: 100px;
+            padding-bottom: 80px;
           }
         }
       `}</style>

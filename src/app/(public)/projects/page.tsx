@@ -197,20 +197,31 @@ function ScrollAnimatedCard({
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"],
+    offset: ["start 80%", "end 20%"],
   });
 
-  // Parallax effect - cards move slower than scroll (reduced for smoother mobile feel)
-  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const scale = useTransform(
+  // Subtle parallax for smooth movement
+  const y = useTransform(scrollYProgress, [0, 1], [30, -30]);
+
+  // Smooth opacity fade using easing
+  const opacity = useTransform(
     scrollYProgress,
-    [0, 0.2, 0.8, 1],
-    [0.95, 1, 1, 0.97],
+    [0, 0.15, 0.85, 1],
+    [0, 1, 1, 0],
+    {
+      clamp: true,
+    },
   );
 
-  // Rotate effect for a premium feel (reduced for smoother animation)
-  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
+  // Subtle scale for depth without jerks
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.1, 0.9, 1],
+    [0.97, 1, 1, 0.98],
+    {
+      clamp: true,
+    },
+  );
 
   return (
     <motion.div
@@ -219,10 +230,7 @@ function ScrollAnimatedCard({
         y,
         opacity,
         scale,
-        rotateX,
-        perspective: "1200px",
       }}
-      transition={{ type: "spring", stiffness: 30, damping: 20 }}
     >
       {children}
     </motion.div>
@@ -235,11 +243,13 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"],
+    offset: ["start 80%", "end 20%"],
   });
 
-  // Image parallax - moves faster than container for depth
-  const imageY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  // Subtle image parallax for smooth depth
+  const imageY = useTransform(scrollYProgress, [0, 1], [-15, 15], {
+    clamp: true,
+  });
 
   return (
     <div ref={ref} className="relative w-full h-full overflow-hidden">
