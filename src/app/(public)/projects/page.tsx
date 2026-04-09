@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
+import Link from "next/link";
 import {
   Github,
   ArrowUpRight,
@@ -56,17 +57,22 @@ function InteractiveGitButton({ url }: { url: string }) {
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <motion.a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <motion.button
+      onClick={handleClick}
       onMouseEnter={() => handleInteraction(true)}
       onMouseLeave={() => handleInteraction(false)}
       onTouchStart={() => handleInteraction(true)}
       onTouchEnd={() => handleInteraction(false)}
-      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black overflow-hidden group active:scale-95 transition-colors"
+      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black overflow-hidden group active:scale-95 transition-colors border-none cursor-pointer"
       whileTap={{ scale: 0.95 }}
+      type="button"
     >
       {/* Smooth shadow glow effect */}
       <motion.div
@@ -100,7 +106,7 @@ function InteractiveGitButton({ url }: { url: string }) {
 
         <Github size={16} />
       </motion.div>
-    </motion.a>
+    </motion.button>
   );
 }
 
@@ -125,17 +131,22 @@ function InteractiveLiveButton({ url }: { url: string }) {
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <motion.a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <motion.button
+      onClick={handleClick}
       onMouseEnter={() => handleInteraction(true)}
       onMouseLeave={() => handleInteraction(false)}
       onTouchStart={() => handleInteraction(true)}
       onTouchEnd={() => handleInteraction(false)}
-      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md shadow-purple-500/10 overflow-hidden group active:scale-95 transition-colors"
+      className="relative inline-flex items-center justify-center px-2.5 py-2.5 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md shadow-purple-500/10 overflow-hidden group active:scale-95 transition-colors border-none cursor-pointer"
       whileTap={{ scale: 0.95 }}
+      type="button"
     >
       {/* Smooth shadow glow effect */}
       <motion.div
@@ -177,7 +188,7 @@ function InteractiveLiveButton({ url }: { url: string }) {
           <ArrowUpRight size={16} strokeWidth={2} />
         </motion.div>
       </motion.div>
-    </motion.a>
+    </motion.button>
   );
 }
 
@@ -376,56 +387,121 @@ export default function Projects() {
                   exit={{ opacity: 0, scale: 0.98 }}
                   className="group"
                 >
-                  {/* COMPACT CARD DESIGN FOR MOBILE */}
-                  <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl">
-                    {/* Smaller Responsive Image */}
-                    <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
-                      {project.image ? (
-                        <ProjectImage src={project.image} alt={project.title} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
-                            No Image
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-grow space-y-4 w-full">
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="space-y-1.5">
-                          <h2 className="text-lg md:text-2xl font-black tracking-tight uppercase leading-tight">
-                            {project.title}
-                          </h2>
-                          <div className="h-0.5 w-6 bg-purple-500 rounded-full" />
-                        </div>
-
-                        <div className="flex gap-2">
-                          {project.github_url && (
-                            <InteractiveGitButton url={project.github_url} />
-                          )}
-                          {project.live_url && (
-                            <InteractiveLiveButton url={project.live_url} />
+                  {project.live_url ? (
+                    <Link
+                      href={project.live_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl cursor-pointer">
+                        {/* Smaller Responsive Image */}
+                        <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
+                          {project.image ? (
+                            <ProjectImage
+                              src={project.image}
+                              alt={project.title}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
+                                No Image
+                              </span>
+                            </div>
                           )}
                         </div>
+
+                        <div className="flex-grow space-y-4 w-full">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="space-y-1.5">
+                              <h2 className="text-lg md:text-2xl font-black tracking-tight uppercase leading-tight">
+                                {project.title}
+                              </h2>
+                              <div className="h-0.5 w-6 bg-purple-500 rounded-full" />
+                            </div>
+
+                            <div className="flex gap-2">
+                              {project.github_url && (
+                                <InteractiveGitButton
+                                  url={project.github_url}
+                                />
+                              )}
+                              {project.live_url && (
+                                <InteractiveLiveButton url={project.live_url} />
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-base leading-relaxed font-normal">
+                            {project.description}
+                          </p>
+
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {project.tech_stack?.map((tech) => (
+                              <span
+                                key={tech}
+                                className="text-[8px] md:text-[9px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase bg-white/50 dark:bg-zinc-800/50"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-10 p-5 md:p-8 bg-white/40 dark:bg-zinc-900/30 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 rounded-[2rem] md:rounded-[2.5rem] hover:bg-white dark:hover:bg-zinc-900/80 transition-all duration-700 shadow-sm hover:shadow-xl opacity-50 cursor-not-allowed">
+                      {/* Smaller Responsive Image */}
+                      <div className="relative w-full md:w-60 aspect-[16/10] md:aspect-square rounded-[1.5rem] md:rounded-[1.8rem] overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800">
+                        {project.image ? (
+                          <ProjectImage
+                            src={project.image}
+                            alt={project.title}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-zinc-400 dark:text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
+                              No Image
+                            </span>
+                          </div>
+                        )}
                       </div>
 
-                      <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-base leading-relaxed font-normal">
-                        {project.description}
-                      </p>
+                      <div className="flex-grow space-y-4 w-full">
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="space-y-1.5">
+                            <h2 className="text-lg md:text-2xl font-black tracking-tight uppercase leading-tight">
+                              {project.title}
+                            </h2>
+                            <div className="h-0.5 w-6 bg-purple-500 rounded-full" />
+                          </div>
 
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {project.tech_stack?.map((tech) => (
-                          <span
-                            key={tech}
-                            className="text-[8px] md:text-[9px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase bg-white/50 dark:bg-zinc-800/50"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                          <div className="flex gap-2">
+                            {project.github_url && (
+                              <InteractiveGitButton url={project.github_url} />
+                            )}
+                            {project.live_url && (
+                              <InteractiveLiveButton url={project.live_url} />
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-base leading-relaxed font-normal">
+                          {project.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {project.tech_stack?.map((tech) => (
+                            <span
+                              key={tech}
+                              className="text-[8px] md:text-[9px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 uppercase bg-white/50 dark:bg-zinc-800/50"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               </ScrollAnimatedCard>
             ))}

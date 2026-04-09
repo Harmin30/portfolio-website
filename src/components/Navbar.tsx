@@ -13,6 +13,7 @@ import {
   BookOpen,
   MessageSquare,
   ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
@@ -64,11 +65,11 @@ export function Navbar() {
       // Always show navbar when at or near the top
       if (window.scrollY <= 10) {
         setScrollDirection("up");
-      } else if (velocity > 15) {
-        // Scrolling down with threshold
+      } else if (velocity > 3) {
+        // Scrolling down with lower threshold for slow scrolls
         setScrollDirection("down");
-      } else if (velocity < -15) {
-        // Scrolling up with threshold
+      } else if (velocity < -3) {
+        // Scrolling up with lower threshold for slow scrolls
         setScrollDirection("up");
       }
       setLastScrollY(window.scrollY);
@@ -189,7 +190,9 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Main floating pill */}
-            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-1.5 sm:px-2 py-1.5 sm:py-2 overflow-hidden will-change-transform backdrop-blur-md">
+            <div className="relative rounded-full bg-gradient-to-br from-white/99 via-slate-50/97 to-slate-100/95 dark:bg-gradient-to-br dark:from-zinc-900/90 dark:via-zinc-950/95 dark:to-black/80 border border-slate-200/70 dark:border-zinc-700/60 shadow-2xl shadow-slate-900/15 dark:shadow-black/30 px-1.5 sm:px-2 py-1.5 sm:py-2 overflow-hidden will-change-transform backdrop-blur-xl">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-300/8 via-blue-200/4 to-purple-300/8 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5" />
               {/* Navigation items */}
               <div className="relative flex items-center gap-1.5 z-10">
                 {mainNavTabs.map((link) => {
@@ -205,7 +208,7 @@ export function Navbar() {
                       {active && (
                         <motion.div
                           layoutId="floating-active"
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-1 bg-gradient-to-r from-zinc-400 to-zinc-500 dark:from-zinc-500 dark:to-zinc-600 rounded-full"
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 dark:from-blue-400 dark:via-blue-500 dark:to-blue-600 rounded-full shadow-md shadow-blue-600/50 dark:shadow-blue-400/30"
                           transition={{
                             type: "spring",
                             stiffness: 350,
@@ -221,8 +224,8 @@ export function Navbar() {
                         }}
                         className={`text-[10px] font-black uppercase tracking-wider relative z-20 ${
                           active
-                            ? "text-blue-600 dark:text-blue-400 font-black"
-                            : "text-zinc-700 dark:text-zinc-400"
+                            ? "text-blue-700 dark:text-blue-400 font-black"
+                            : "text-slate-600 dark:text-zinc-400"
                         }`}
                       >
                         {link.label}
@@ -232,7 +235,7 @@ export function Navbar() {
                 })}
 
                 {/* Divider */}
-                <div className="h-5 w-px bg-zinc-300 dark:bg-zinc-600 rounded-full mx-0.5 opacity-30" />
+                <div className="h-5 w-px bg-gradient-to-b from-transparent via-slate-300/60 to-transparent dark:via-zinc-600 rounded-full mx-0.5 opacity-50" />
 
                 {/* Expand button */}
                 <motion.button
@@ -247,7 +250,7 @@ export function Navbar() {
                     repeat: Infinity,
                     repeatType: "loop",
                   }}
-                  className="flex items-center justify-center px-2 py-2 rounded-full hover:bg-white/20 dark:hover:bg-white/10 transition-all relative z-20"
+                  className="flex items-center justify-center px-2 py-2 rounded-full hover:bg-slate-200/40 dark:hover:bg-white/15 transition-all relative z-20 group"
                 >
                   <motion.div
                     animate={{ rotate: expandedNav ? 180 : 0 }}
@@ -277,8 +280,10 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-md">
-              <div className="relative z-10 grid grid-cols-4 gap-1.5 mb-3">
+            <div className="relative rounded-2xl bg-gradient-to-br from-white/98 via-zinc-50/96 to-zinc-100/94 dark:bg-gradient-to-br dark:from-zinc-900/92 dark:via-zinc-950/96 dark:to-black/90 border border-zinc-200/70 dark:border-zinc-700/50 shadow-2xl shadow-black/15 dark:shadow-black/40 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-xl">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/0 via-transparent to-purple-300/0 dark:from-blue-500/8 dark:via-transparent dark:to-pink-500/8" />
+              <div className="relative z-10 grid grid-cols-4 gap-1.5">
                 {expandedNavTabs.map((link, idx) => {
                   const active = isActive(link.href);
                   const Icon = link.icon;
@@ -293,12 +298,12 @@ export function Navbar() {
                       <Link
                         href={link.href}
                         onClick={() => setExpandedNav(false)}
-                        className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-white/20 dark:hover:bg-white/10 transition-all relative group"
+                        className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-slate-200/40 dark:hover:bg-white/10 transition-all relative group"
                       >
                         {active && (
                           <motion.div
                             layoutId="expanded-active"
-                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-zinc-400 to-zinc-500 dark:from-zinc-500 dark:to-zinc-600 rounded-full"
+                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-5 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 dark:from-blue-400 dark:via-blue-500 dark:to-blue-600 rounded-full shadow-md shadow-blue-600/50 dark:shadow-blue-400/30"
                             transition={{
                               type: "spring",
                               stiffness: 350,
@@ -313,8 +318,8 @@ export function Navbar() {
                           }}
                           className={`relative z-10 transition-colors ${
                             active
-                              ? "text-blue-500 dark:text-blue-400"
-                              : "text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200"
+                              ? "text-blue-700 dark:text-blue-400"
+                              : "text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-zinc-200"
                           }`}
                         >
                           <Icon
@@ -324,34 +329,42 @@ export function Navbar() {
                           />
                         </motion.div>
 
-                        <span className="text-[8px] sm:text-[9px] font-black uppercase text-zinc-700 dark:text-zinc-200 text-center leading-tight relative z-10">
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase text-slate-700 dark:text-zinc-200 text-center leading-tight relative z-10">
                           {link.label}
                         </span>
                       </Link>
                     </motion.div>
                   );
                 })}
-              </div>
 
-              {/* Close button */}
-              <motion.button
-                onClick={() => setExpandedNav(false)}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative z-10 w-full flex items-center justify-center gap-1.5 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg bg-white/70 dark:bg-white/10 hover:bg-white/95 dark:hover:bg-white/15 transition-all backdrop-blur border border-zinc-300 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 font-black uppercase text-[10px] sm:text-[11px] tracking-wide"
-              >
+                {/* Close button in grid */}
                 <motion.div
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <ChevronUp
-                    size={12}
-                    className="sm:size-[14px]"
-                    strokeWidth={2.5}
-                  />
+                  <button
+                    onClick={() => setExpandedNav(false)}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all relative group w-full h-full"
+                  >
+                    <motion.div
+                      animate={{
+                        scale: 1,
+                      }}
+                      className="relative z-10 transition-colors text-red-600 dark:text-red-500 group-hover:text-red-700 dark:group-hover:text-red-400"
+                    >
+                      <ChevronDown
+                        size={20}
+                        className="sm:size-[22px]"
+                        strokeWidth={1.8}
+                      />
+                    </motion.div>
+                    <span className="text-[8px] sm:text-[9px] font-black uppercase text-slate-700 dark:text-zinc-300 text-center leading-tight relative z-10">
+                      Close
+                    </span>
+                  </button>
                 </motion.div>
-                <span className="hidden xs:inline">Close</span>
-              </motion.button>
+              </div>
             </div>
           </motion.nav>
         ) : !isHome && scrollDirection === "up" && !expandedNav ? (
@@ -368,19 +381,21 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Minimal pill */}
-            <div className="relative rounded-full bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/95 dark:via-zinc-900/98 dark:to-zinc-950/95 border border-zinc-200 dark:border-zinc-700/40 shadow-lg shadow-black/5 px-2.5 sm:px-3.5 py-2 sm:py-2.5 overflow-hidden flex items-center gap-1.5 sm:gap-2 will-change-transform backdrop-blur-md">
+            <div className="relative rounded-full bg-gradient-to-br from-white/99 via-slate-50/97 to-slate-100/95 dark:bg-gradient-to-br dark:from-zinc-900/90 dark:via-zinc-950/95 dark:to-black/80 border border-slate-200/70 dark:border-zinc-700/60 shadow-2xl shadow-slate-900/15 dark:shadow-black/30 px-2.5 sm:px-3.5 py-2 sm:py-2.5 overflow-hidden flex items-center gap-1.5 sm:gap-2 will-change-transform backdrop-blur-xl">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-300/8 via-blue-200/4 to-purple-300/8 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5" />
               {/* Current page display */}
               <div className="relative flex items-center gap-1.5 z-10">
                 {currentPage && (
                   <>
-                    <motion.div className="text-blue-500 dark:text-blue-400">
+                    <div className="text-blue-600 dark:text-blue-400">
                       <currentPage.icon
                         size={16}
                         className="sm:size-[18px]"
                         strokeWidth={2.2}
                       />
-                    </motion.div>
-                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-zinc-700 dark:text-zinc-200">
+                    </div>
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-slate-700 dark:text-zinc-200">
                       {currentPage.label}
                     </span>
                   </>
@@ -392,7 +407,7 @@ export function Navbar() {
                 onClick={() => setExpandedNav(true)}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center px-1.5 py-1.5 rounded-full hover:bg-white/20 dark:hover:bg-white/10 transition-all relative z-10"
+                className="flex items-center justify-center px-1.5 py-1.5 rounded-full hover:bg-slate-200/40 dark:hover:bg-white/15 transition-all relative z-10 group"
               >
                 <motion.div
                   animate={{ rotate: expandedNav ? 180 : 0 }}
@@ -401,7 +416,7 @@ export function Navbar() {
                   <ChevronUp
                     size={16}
                     strokeWidth={2.5}
-                    className="text-zinc-600 dark:text-zinc-400"
+                    className="text-slate-600 dark:text-zinc-400"
                   />
                 </motion.div>
               </motion.button>
@@ -421,8 +436,10 @@ export function Navbar() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[90] lg:hidden will-change-transform"
           >
             {/* Expanded pill - solid background from start */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-white via-white/99 to-zinc-50/98 dark:bg-gradient-to-br dark:from-zinc-800/90 dark:via-zinc-900/98 dark:to-zinc-950/92 border border-zinc-200 dark:border-zinc-700/40 shadow-xl shadow-black/10 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-md">
-              <div className="relative z-10 grid grid-cols-4 gap-1.5 mb-3">
+            <div className="relative rounded-2xl bg-gradient-to-br from-white/99 via-slate-50/97 to-slate-100/94 dark:bg-gradient-to-br dark:from-zinc-900/92 dark:via-zinc-950/96 dark:to-black/90 border border-slate-200/70 dark:border-zinc-700/50 shadow-2xl shadow-slate-900/20 dark:shadow-black/40 p-3 sm:p-4 md:p-5 w-72 sm:w-80 md:w-88 overflow-hidden will-change-transform backdrop-blur-xl">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/10 via-blue-200/4 to-purple-300/10 dark:from-blue-500/8 dark:via-transparent dark:to-pink-500/8" />
+              <div className="relative z-10 grid grid-cols-4 gap-1.5">
                 {expandedNavTabs.map((link, idx) => {
                   const active = isActive(link.href);
                   const Icon = link.icon;
@@ -437,12 +454,12 @@ export function Navbar() {
                       <Link
                         href={link.href}
                         onClick={() => setExpandedNav(false)}
-                        className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-white/20 dark:hover:bg-white/10 transition-all relative group"
+                        className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-slate-200/40 dark:hover:bg-white/10 transition-all relative group"
                       >
                         {active && (
                           <motion.div
                             layoutId="expanded-active-non-home"
-                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-zinc-400 to-zinc-500 dark:from-zinc-500 dark:to-zinc-600 rounded-full"
+                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-5 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 dark:from-blue-400 dark:via-blue-500 dark:to-blue-600 rounded-full shadow-md shadow-blue-600/50 dark:shadow-blue-400/30"
                             transition={{
                               type: "spring",
                               stiffness: 350,
@@ -457,45 +474,53 @@ export function Navbar() {
                           }}
                           className={`relative z-10 transition-colors ${
                             active
-                              ? "text-blue-500 dark:text-blue-400"
-                              : "text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200"
+                              ? "text-blue-700 dark:text-blue-400"
+                              : "text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-zinc-200"
                           }`}
                         >
                           <Icon
-                            size={18}
-                            className="sm:size-[20px]"
+                            size={20}
+                            className="sm:size-[22px]"
                             strokeWidth={1.8}
                           />
                         </motion.div>
 
-                        <span className="text-[7px] sm:text-[8px] font-black uppercase text-zinc-700 dark:text-zinc-200 text-center leading-tight relative z-10">
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase text-slate-700 dark:text-zinc-200 text-center leading-tight relative z-10">
                           {link.label}
                         </span>
                       </Link>
                     </motion.div>
                   );
                 })}
-              </div>
 
-              {/* Close button */}
-              <motion.button
-                onClick={() => setExpandedNav(false)}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative z-10 w-full flex items-center justify-center gap-1.5 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg bg-white/70 dark:bg-white/10 hover:bg-white/95 dark:hover:bg-white/15 transition-all backdrop-blur border border-zinc-300 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 font-black uppercase text-[10px] sm:text-[11px] tracking-wide"
-              >
+                {/* Close button in grid */}
                 <motion.div
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <ChevronUp
-                    size={12}
-                    className="sm:size-[14px]"
-                    strokeWidth={2.5}
-                  />
+                  <button
+                    onClick={() => setExpandedNav(false)}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all relative group w-full h-full"
+                  >
+                    <motion.div
+                      animate={{
+                        scale: 1,
+                      }}
+                      className="relative z-10 transition-colors text-red-600 dark:text-red-500 group-hover:text-red-700 dark:group-hover:text-red-400"
+                    >
+                      <ChevronDown
+                        size={20}
+                        className="sm:size-[22px]"
+                        strokeWidth={1.8}
+                      />
+                    </motion.div>
+                    <span className="text-[8px] sm:text-[9px] font-black uppercase text-slate-700 dark:text-zinc-300 text-center leading-tight relative z-10">
+                      Close
+                    </span>
+                  </button>
                 </motion.div>
-                <span className="hidden xs:inline">Close</span>
-              </motion.button>
+              </div>
             </div>
           </motion.nav>
         ) : null}
