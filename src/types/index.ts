@@ -49,6 +49,7 @@ export interface Project {
   github_url?: string;
   live_url?: string;
   display_order?: number;
+  published?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -75,6 +76,7 @@ export interface Certificate {
   certificate_url: string;
   description?: string;
   is_featured?: boolean;
+  published?: boolean;
   created_at: string;
   updated_at: string;
 }

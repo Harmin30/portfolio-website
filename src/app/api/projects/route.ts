@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -8,11 +9,20 @@ const supabase = createClient(supabaseUrl || "", supabaseServiceKey || "");
 
 export async function GET(request: NextRequest) {
   try {
-    const { data, error } = await supabase
+    const searchParams = request.nextUrl.searchParams;
+    const published = searchParams.get("published") === "true";
+
+    let query = supabase
       .from("projects")
       .select("*")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: false });
+
+    if (published) {
+      query = query.eq("published", true);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
@@ -31,8 +41,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, image, tech_stack, github_url, live_url } =
-      body;
+    const {
+      title,
+      description,
+      image,
+      tech_stack,
+      github_url,
+      live_url,
+      published,
+    } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -61,11 +78,20 @@ export async function POST(request: NextRequest) {
           github_url,
           live_url,
           display_order: nextOrder,
+          published: published !== undefined ? published : true,
         },
       ])
       .select();
 
     if (error) throw error;
+
+    // Revalidate public pages
+    try {
+      revalidatePath("/projects", "page");
+      revalidatePath("/", "page");
+    } catch (e) {
+      console.log("Revalidation triggered");
+    }
 
     return NextResponse.json(data[0], { status: 201 });
   } catch (error) {

@@ -14,8 +14,10 @@ import {
   Briefcase,
   Link2,
   Image as ImageIcon,
+  Crop,
 } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
+import { ImageCropper } from "@/components/ImageCropper";
 
 interface EducationEntry {
   degree: string;
@@ -38,6 +40,7 @@ export default function AdminAbout() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showUploadMode, setShowUploadMode] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [aboutText, setAboutText] = useState("");
@@ -150,6 +153,32 @@ export default function AdminAbout() {
     }
   };
 
+  const submitFormDirectly = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/about", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          about_text: aboutText,
+          profile_photo: profilePhoto,
+          resume_link: resumeLink,
+          education: education.filter((e) => e.degree || e.school),
+          experience: experience.filter((e) => e.title || e.company),
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to save");
+      notification.success("Profile photo updated!");
+
+      // Force revalidation
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto space-y-6">
@@ -219,6 +248,15 @@ export default function AdminAbout() {
                 >
                   UPLOAD
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCropper(true)}
+                  className="flex-1 py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-center gap-1"
+                  title="Crop and upload image"
+                >
+                  <Crop size={12} />
+                  CROP
+                </button>
               </div>
 
               {/* Compact Preview Container */}
@@ -231,16 +269,22 @@ export default function AdminAbout() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <UserCircle size={48} className="text-slate-200 dark:text-slate-800" />
+                    <UserCircle
+                      size={48}
+                      className="text-slate-200 dark:text-slate-800"
+                    />
                   )}
-                  
+
                   {isUploading && (
                     <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center">
-                      <Loader size={24} className="animate-spin text-indigo-600" />
+                      <Loader
+                        size={24}
+                        className="animate-spin text-indigo-600"
+                      />
                     </div>
                   )}
                 </div>
-                
+
                 {profilePhotoPreview && (
                   <button
                     type="button"
@@ -278,7 +322,10 @@ export default function AdminAbout() {
                 ) : (
                   <div className="space-y-2">
                     <label className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all group">
-                      <Upload size={16} className="text-slate-400 group-hover:text-indigo-500" />
+                      <Upload
+                        size={16}
+                        className="text-slate-400 group-hover:text-indigo-500"
+                      />
                       <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">
                         Select Image
                       </span>
@@ -316,7 +363,8 @@ export default function AdminAbout() {
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
                 <p className="text-[11px] text-slate-400 font-bold leading-relaxed uppercase tracking-tight">
-                  Provide a direct link to your professional PDF resume or portfolio stored in the cloud.
+                  Provide a direct link to your professional PDF resume or
+                  portfolio stored in the cloud.
                 </p>
               </div>
             </div>
@@ -538,6 +586,22 @@ export default function AdminAbout() {
           </button>
         </div>
       </form>
+
+      <ImageCropper
+        isOpen={showCropper}
+        onClose={() => setShowCropper(false)}
+        onCropComplete={async (url) => {
+          setProfilePhoto(url);
+          setProfilePhotoPreview(url);
+          setProfilePhotoUrl(url);
+          setShowCropper(false);
+          // Automatically save the cropped image
+          setTimeout(() => {
+            submitFormDirectly();
+          }, 100);
+        }}
+        folder="profile-photos"
+      />
     </motion.div>
   );
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -66,6 +67,10 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (error) throw error;
+
+    // Revalidate public pages
+    revalidatePath("/blog");
+    revalidatePath("/");
 
     return NextResponse.json(data[0], { status: 201 });
   } catch (error) {

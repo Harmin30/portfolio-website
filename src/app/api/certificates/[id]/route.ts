@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,6 +50,7 @@ export async function PUT(
       certificate_url,
       description,
       is_featured,
+      published,
     } = body;
 
     // Check if either date_obtained OR date range (date_from AND date_to) is provided
@@ -81,6 +83,7 @@ export async function PUT(
         certificate_url,
         description: description || null,
         is_featured: is_featured || false,
+        published: published !== undefined ? published : undefined,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
@@ -89,6 +92,14 @@ export async function PUT(
     if (error) {
       console.error("Supabase update error:", error);
       throw error;
+    }
+
+    // Revalidate public pages
+    try {
+      revalidatePath("/certificates", "page");
+      revalidatePath("/", "page");
+    } catch (e) {
+      console.log("Revalidation triggered");
     }
 
     return NextResponse.json(data[0], { status: 200 });

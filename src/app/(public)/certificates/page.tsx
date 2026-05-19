@@ -37,11 +37,9 @@ export default function Certificates() {
 
   const fetchCertificates = async () => {
     try {
-      const { data } = await supabase
-        .from("certificates")
-        .select("*")
-        .order("is_featured", { ascending: false })
-        .order("date_obtained", { ascending: false });
+      const response = await fetch("/api/certificates?published=true");
+      if (!response.ok) throw new Error("Failed to fetch certificates");
+      const data = await response.json();
       setCertificates(data || []);
     } catch (err) {
       console.error(err);

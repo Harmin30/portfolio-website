@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Project } from "@/types";
 import {
@@ -66,8 +66,10 @@ export default function AdminProjects() {
     tech_stack: [] as string[],
     github_url: "",
     live_url: "",
+    published: true,
   });
   const [techInput, setTechInput] = useState("");
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -256,10 +258,15 @@ export default function AdminProjects() {
       tech_stack: project.tech_stack || [],
       github_url: project.github_url || "",
       live_url: project.live_url || "",
+      published: project.published !== undefined ? project.published : true,
     });
     setEditingId(project.id);
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
 
   const resetForm = () => {
@@ -270,6 +277,7 @@ export default function AdminProjects() {
       tech_stack: [],
       github_url: "",
       live_url: "",
+      published: true,
     });
     setEditingId(null);
     setShowForm(false);
@@ -333,6 +341,7 @@ export default function AdminProjects() {
       <AnimatePresence>
         {showForm && (
           <motion.div
+            ref={formRef}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -468,6 +477,27 @@ export default function AdminProjects() {
                 </div>
               </div>
 
+              <div className="flex items-end pb-1">
+                <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 w-full">
+                  <div
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        published: !formData.published,
+                      })
+                    }
+                    className={`relative w-10 h-5 rounded-full transition-colors ${formData.published ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-700"}`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${formData.published ? "translate-x-5" : ""}`}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
+                    {formData.published ? "Published" : "Draft"}
+                  </span>
+                </label>
+              </div>
+
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-4">
                 <button
                   type="button"
@@ -561,9 +591,20 @@ export default function AdminProjects() {
 
                 <div className="p-6 space-y-5">
                   <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
-                      {project.title}
-                    </h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate flex-1">
+                        {project.title}
+                      </h3>
+                      <span
+                        className={`px-2.5 py-1 text-[10px] font-bold rounded-full whitespace-nowrap ${
+                          project.published
+                            ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                            : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                        }`}
+                      >
+                        {project.published ? "Published" : "Draft"}
+                      </span>
+                    </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 h-8">
                       {project.description}
                     </p>

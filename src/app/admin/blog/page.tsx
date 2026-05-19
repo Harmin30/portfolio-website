@@ -377,9 +377,9 @@ export default function AdminBlog() {
                     {post.title}
                   </h3>
                   <span
-                    className={`text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded ${post.published ? "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400" : "bg-slate-100 dark:bg-white/10 text-slate-500"}`}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${post.published ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400" : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"}`}
                   >
-                    {post.published ? "Online" : "Draft"}
+                    {post.published ? "Published" : "Draft"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">

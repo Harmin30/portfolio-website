@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -202,6 +203,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (result.error) throw result.error;
+
+    // Revalidate public pages
+    try {
+      revalidatePath("/about", "page");
+      revalidatePath("/", "page");
+    } catch (e) {
+      console.log("Revalidation triggered");
+    }
 
     // Parse the result data
     const parsedResult = {

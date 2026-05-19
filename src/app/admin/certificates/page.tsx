@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -35,7 +35,9 @@ export default function AdminCertificates() {
     certificate_url: "",
     description: "",
     is_featured: false,
+    published: true,
   });
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchCertificates();
@@ -97,6 +99,7 @@ export default function AdminCertificates() {
             certificate_url: formData.certificate_url,
             description: formData.description,
             is_featured: formData.is_featured,
+            published: formData.published,
           })
           .eq("id", editingId);
         if (error) throw error;
@@ -112,6 +115,7 @@ export default function AdminCertificates() {
             certificate_url: formData.certificate_url,
             description: formData.description,
             is_featured: formData.is_featured,
+            published: formData.published,
           },
         ]);
         if (error) throw error;
@@ -155,6 +159,7 @@ export default function AdminCertificates() {
       certificate_url: "",
       description: "",
       is_featured: false,
+      published: true,
     });
     setEditingId(null);
     setShowForm(false);
@@ -226,6 +231,7 @@ export default function AdminCertificates() {
       <AnimatePresence>
         {showForm && (
           <motion.div
+            ref={formRef}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -427,6 +433,27 @@ export default function AdminCertificates() {
                 </div>
               </div>
 
+              <div className="flex items-end pb-1">
+                <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 w-full">
+                  <div
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        published: !formData.published,
+                      })
+                    }
+                    className={`relative w-10 h-5 rounded-full transition-colors ${formData.published ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-700"}`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${formData.published ? "translate-x-5" : ""}`}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
+                    {formData.published ? "Published" : "Draft"}
+                  </span>
+                </label>
+              </div>
+
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -499,6 +526,15 @@ export default function AdminCertificates() {
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
                       {cert.title}
                     </h3>
+                    <span
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-full whitespace-nowrap ${
+                        cert.published
+                          ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                          : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                      }`}
+                    >
+                      {cert.published ? "Published" : "Draft"}
+                    </span>
                     {cert.is_featured && (
                       <span className="px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
                         Featured
@@ -587,10 +623,19 @@ export default function AdminCertificates() {
                         certificate_url: cert.certificate_url,
                         description: cert.description || "",
                         is_featured: cert.is_featured || false,
+                        published:
+                          cert.published !== undefined ? cert.published : true,
                       });
                       setEditingId(cert.id);
                       setShowForm(true);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      setTimeout(() => {
+                        if (formRef.current) {
+                          formRef.current.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }
+                      }, 100);
                     }}
                     className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                   >

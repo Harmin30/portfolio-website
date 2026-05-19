@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Crop } from "lucide-react";
 import { useNotification } from "@/lib/useNotification";
+import { ImageCropper } from "./ImageCropper";
 
 interface ImageUploaderProps {
   value: string;
@@ -31,6 +32,7 @@ export function ImageUploader({
   const [isUploading, setIsUploading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [showUploadMode, setShowUploadMode] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,6 +129,14 @@ export function ImageUploader({
         >
           Upload
         </button>
+        <button
+          type="button"
+          onClick={() => setShowCropper(true)}
+          className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center gap-1"
+        >
+          <Crop size={12} />
+          Crop
+        </button>
       </div>
 
       {!showUploadMode && (
@@ -180,7 +190,9 @@ export function ImageUploader({
       {value && (
         <div className="space-y-2">
           {/* Apply previewClass to the container if it exists, otherwise use default aspect-video */}
-          <div className={`relative bg-slate-100 dark:bg-slate-800 overflow-hidden ${previewClass || "w-full aspect-video rounded-xl"}`}>
+          <div
+            className={`relative bg-slate-100 dark:bg-slate-800 overflow-hidden ${previewClass || "w-full aspect-video rounded-xl"}`}
+          >
             {imageLoading && (
               <div className="absolute inset-0 bg-gradient-to-r from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 animate-pulse" />
             )}
@@ -205,6 +217,16 @@ export function ImageUploader({
           </button>
         </div>
       )}
+
+      <ImageCropper
+        isOpen={showCropper}
+        onClose={() => setShowCropper(false)}
+        onCropComplete={(url) => {
+          onChange(url);
+          setShowCropper(false);
+        }}
+        folder={folder}
+      />
     </div>
   );
 }

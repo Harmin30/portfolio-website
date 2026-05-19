@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -45,6 +46,7 @@ export async function PUT(
       github_url,
       live_url,
       display_order,
+      published,
     } = body;
 
     const { data, error } = await supabase
@@ -57,12 +59,21 @@ export async function PUT(
         github_url,
         live_url,
         display_order: display_order !== undefined ? display_order : undefined,
+        published: published !== undefined ? published : undefined,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
       .select();
 
     if (error) throw error;
+
+    // Revalidate public pages
+    try {
+      revalidatePath("/projects", "page");
+      revalidatePath("/", "page");
+    } catch (e) {
+      console.log("Revalidation triggered");
+    }
 
     return NextResponse.json(data[0], { status: 200 });
   } catch (error) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -6,12 +7,22 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabase = createClient(supabaseUrl || "", supabaseServiceKey || "");
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { data, error } = await supabase
+    const searchParams = request.nextUrl.searchParams;
+    const published = searchParams.get("published") === "true";
+
+    let query = supabase
       .from("certificates")
       .select("*")
+      .order("is_featured", { ascending: false })
       .order("date_obtained", { ascending: false });
+
+    if (published) {
+      query = query.eq("published", true);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error("Supabase error:", error);
@@ -39,6 +50,7 @@ export async function POST(request: NextRequest) {
       date_to,
       certificate_url,
       description,
+      published,
     } = body;
 
     // Check if either date_obtained OR date range (date_from AND date_to) is provided
@@ -71,6 +83,7 @@ export async function POST(request: NextRequest) {
           date_to: date_to || null,
           certificate_url,
           description: description || null,
+          published: published !== undefined ? published : true,
         },
       ])
       .select();
@@ -78,6 +91,14 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Supabase insert error:", error);
       throw error;
+    }
+
+    // Revalidate public pages
+    try {
+      revalidatePath("/certificates", "page");
+      revalidatePath("/", "page");
+    } catch (e) {
+      console.log("Revalidation triggered");
     }
 
     return NextResponse.json(data[0], { status: 201 });
